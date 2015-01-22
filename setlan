@@ -1,151 +1,153 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#	TRADUCTORES E INTERPRETADORES CI3725
-#	Primera entrega del proyecto
-#	Autores: Carlos Martínez 	- 11-10584
-#			 Christian Teixeira - 11-10584
-
+# # # # # # # # # # # # # # # # # # # # # # # #
+#	TRADUCTORES E INTERPRETADORES CI3725      #
+#	Primera entrega del proyecto.             #
+#   Lexer para el lenguaje Setlan             #
+#	Autores: Carlos Martínez 	- 11-10584    #
+#			 Christian Teixeira - 11-10584    #
+# # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.lex as lex
 
 tokens = (
-		'PROGRAM',
-		'OPENCURLY',
-		'CLOSECURLY',
-		'OPENPAREN',
-		'CLOSEPAREN',
-		'PRINT',
-		'PRINTLN',
-		'IN',
-		'USING',
-		'INT',
-		'BOOL',
-		'SCAN',
+		'Program',
+		'OpenCurly',
+		'ClosedCurly',
+		'OpenParen',
+		'ClosedParen',
+		'Print',
+		'Println',
+		'In',
+		'Using',
+		'Int',
+		'Bool',
+		'Scan',
 		'ID',
-		'COMMA',
-		'DOT',
-		'SEMICOLON',
-		'COLON',
-		'EQUAL',
-		'STRING',
-		'PLUS',
-		'MINUS',
-		'IF',
-		'ELSE',
-		'TRUE',
-		'OR',
-		'AND',
-		'NOT',
-		'FALSE',
-		'FOR',
-		'REPEAT',
-		'WHILE',
-		'DO',
-		'SET',
-		'LESSTHAN',
-		'GREATERTHAN',
-		'LESSTHANOREQUAL',
-		'GREATERTHANOREQUAL',
-		'EQUALS',
-		'NOTEQUALS',
-		'ASTERISK',
-		'DEF',
-		'RETURN',
-		'ARROW',
-		'SLASH',
-		'PERCENT',
-		'ARROBA',
-		'UNION',
-		'INTERSECTION',
-		'COMPLEMENT',
-		'SETSUM',
-		'SETREST',
-		'SETSUBSTRACT',
-		'SETMULT',
-		'SETDIV',
-		'SETMOD',
-		'SETMAX',
-		'SETMIN',
-		'SETLENGTH',
-		'NUMBER',
-		'TEXT',
+		'Comma',
+		'Dot',
+		'Semicolon',
+		'Colon',
+		'Assign',
+		'String',
+		'Plus',
+		'Minus',
+		'If',
+		'Else',
+		'True',
+		'Or',
+		'And',
+		'Not',
+		'False',
+		'For',
+		'Repeat',
+		'While',
+		'Do',
+		'Set',
+		'LessThan',
+		'GreaterThan',
+		'LessThanOrEqual',
+		'GreaterThanOrEqual',
+		'Equal',
+		'NotEqual',
+		'Asterisk',
+		'Def',
+		'Return',
+		'Arrow',
+		'Slash',
+		'Percent',
+		'Arroba',
+		'Union',
+		'Intersection',
+		'Complement',
+		'SetSum',
+		'SetRest',
+		'SetSubstract',
+		'SetMult',
+		'SetDiv',
+		'SetMod',
+		'SetMax',
+		'SetMin',
+		'SetLength',
+		'Number',
+		'Text',
 	)
 
 reserved = {
-	'program' : 'PROGRAM',
-	'print' : 'PRINT',
-	'println' : 'PRINTLN',
-	'using' : 'USING',
-	'int' : 'INT',
-	'bool' : 'BOOL',
-	'string' : 'STRING',
-	'scan' : 'SCAN',
-	'if' : 'IF',
-	'else' : 'ELSE',
-	'in' : 'IN',
-	'true' : 'TRUE',
-	'false' : 'FALSE',
-	'or' : 'OR',
-	'and' : 'AND',
-	'not' : 'NOT',
-	'for' : 'FOR',
-	'repeat' : 'REPEAT',
-	'while' : 'WHILE',
-	'do' : 'DO',
-	'set' : 'SET',
-	'def' : 'DEF',
-	'return' : 'RETURN',
+	'program' : 'Program',
+	'print' : 'Print',
+	'println' : 'Println',
+	'using' : 'Using',
+	'int' : 'Int',
+	'bool' : 'Bool',
+	'string' : 'String',
+	'scan' : 'Scan',
+	'if' : 'If',
+	'else' : 'Else',
+	'in' : 'In',
+	'true' : 'True',
+	'false' : 'False',
+	'or' : 'Or',
+	'and' : 'And',
+	'not' : 'Not',
+	'for' : 'For',
+	'repeat' : 'Repeat',
+	'while' : 'While',
+	'do' : 'Do',
+	'set' : 'Set',
+	'def' : 'Def',
+	'return' : 'Return',
 }
 
-t_OPENCURLY = r'\{'
-t_CLOSECURLY = r'\}'
-t_OPENPAREN = r'\('
-t_CLOSEPAREN = r'\)'
-t_PLUS    = r'\+'
-t_MINUS = r'-'
-t_SEMICOLON = r';'
-t_COLON = r':'
-t_COMMA = r','
-t_DOT = r'\.'
-t_EQUAL = r'='
-t_ARROW = r'->'
-t_GREATERTHAN = r'>'
-t_LESSTHAN = r'<'
-t_GREATERTHANOREQUAL = r'>='
-t_LESSTHANOREQUAL = r'<='
-t_EQUALS = r'=='
-t_NOTEQUALS = r"/="
-t_ASTERISK = r'\*'
-t_ARROBA = r'@'
-t_SLASH = r'/'
-t_PERCENT = r'%'
-t_UNION = r'\+\+'
-t_INTERSECTION = r'><'
-t_COMPLEMENT = r'\\'
-t_SETSUM = r'<\+>'
-t_SETSUBSTRACT = r'<->'
-t_SETMULT = r'<\*>'
-t_SETDIV = r'</>'
-t_SETMOD = r'<%>'
-t_SETMAX = r'>\?'
-t_SETMIN = r'<\?'
-t_SETLENGTH = r'\$\?'
+t_OpenCurly = r'\{'
+t_ClosedCurly = r'\}'
+t_OpenParen = r'\('
+t_ClosedParen = r'\)'
+t_Plus    = r'\+'
+t_Minus = r'-'
+t_Semicolon = r';'
+t_Colon = r':'
+t_Comma = r','
+t_Dot = r'\.'
+t_Assign = r'='
+t_Arrow = r'->'
+t_GreaterThan = r'>'
+t_LessThan = r'<'
+t_GreaterThanOrEqual = r'>='
+t_LessThanOrEqual = r'<='
+t_Equal = r'=='
+t_NotEqual = r"/="
+t_Asterisk = r'\*'
+t_Arroba = r'@'
+t_Slash = r'/'
+t_Percent = r'%'
+t_Union = r'\+\+'
+t_Intersection = r'><'
+t_Complement = r'\\'
+t_SetSum = r'<\+>'
+t_SetSubstract = r'<->'
+t_SetMult = r'<\*>'
+t_SetDiv = r'</>'
+t_SetMod = r'<%>'
+t_SetMax = r'>\?'
+t_SetMin = r'<\?'
+t_SetLength = r'\$\?'
 
 t_ignore  = ' |\t'
 
-def t_NUMBER(t):
+def t_Number(t):
     r'\d+'
     t.value = int(t.value)    
     return t
 
-def t_TEXT(t):
-    r'["\'][a-zA-Z0-9 \t.,:;!=()¿?<>¡!/&%$#]*["\']'
-    t.type = reserved.get(t.value,'TEXT')
+def t_Text(t):
+    r'\"[a-zA-Z0-9 \t.,:;!=()¿?<>¡!/&%$#]*\"'
+    t.type = reserved.get(t.value,'Text')
     return t
 
 def t_ID(t):
-	r'[a-zA-Z][a-zA-Z0-9_]*'
+	r'[a-zA-Z_][a-zA-Z0-9_]*'
 	t.type = reserved.get(t.value,'ID')
 	return t
 
@@ -157,25 +159,44 @@ def t_ignore_comment(t):
 	r'\#.*'
 	pass
 
-def t_ERROR(t):
-	print("ERROR: Illegal character: " + str(t.value[0]))
+def t_error(t):
+	error.append(t)
 	t.lexer.skip(1)
 
+def main(argv  = None):
+	import sys
+	if(argv is None):
+		argv = sys.argv
+	if(len(argv) == 1):
+		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo]")
+		exit(1)
 
-lexer = lex.lex()
-archivo = open("papas.txt", "r")
-contenido = archivo.read()
-print(contenido)
-lexer.input(contenido)
-out = ""
-first = True
-while True:
-	tok = lexer.token()
-	if not tok: break
-	if not first: out = out + "\n"
-	first = False
-	if(tok.type == "TEXT" or tok.type == "ID"):
-		out = out + "Token" + str(tok.type) + ": " + tok.value + " (Línea " + str(tok.lineno) + ", Columna " + str(tok.lexpos) + ")"
+	global error
+	error = []
+	out = []
+	nombreArchivo = argv[1]
+	archivo = open(nombreArchivo, "r")
+	contenido = archivo.read()
+
+	lexer = lex.lex()
+	lexer.input(contenido)
+
+	while True:
+		tok = lexer.token()
+		if not tok: break
+		out.append(tok)
+
+	# Imprimir resultados
+
+	if len(error) == 0:
+		for t in out:
+			if(t.type == "Text" or t.type == "ID" or t.type == 'Number'):
+				print("Token" + str(t.type) + ": " + str(t.value) + " (Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ")")
+			else:
+				print("Token" + str(t.type) + "(Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ")")
 	else:
-		out = out + "Token" + str(tok.type) + "(Línea " + str(tok.lineno) + ", Columna " + str(tok.lexpos) + ")"
-print(out)
+		for t in error:
+			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ".")
+
+if __name__ == "__main__":
+	main()
