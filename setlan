@@ -55,7 +55,7 @@ tokens = (
 		'Def',
 		'Return',
 		'Arrow',
-		'Slash',
+		'IntDiv',
 		'Percent',
 		'Arroba',
 		'Union',
@@ -120,7 +120,7 @@ t_Equal = r'=='
 t_NotEqual = r"/="
 t_Asterisk = r'\*'
 t_Arroba = r'@'
-t_Slash = r'/'
+t_IntDiv = r'/'
 t_Percent = r'%'
 t_Union = r'\+\+'
 t_Intersection = r'><'
