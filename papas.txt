@@ -1,11 +1,56 @@
 program {
- using
- int x,y,z;
- in
-
- scan x; $
- println $ "Hola, soy la variable x, valgo: ", x;
- y = x+2;
- # Hola, soy un comentario y no un token. Seamos amigos, :). 
- &&
+using
+int x;
+set y;
+bool z;
+in
+# incializado en 0
+# incializado en {}
+# inicalizado en false
+println "start";
+{
+using
+set x;
+in
+x = {0,1}
+y = x + {2,3,4};
+println 1, x;
+println 2, y;
+println 3, z;
+# inicializado en {}
+# x es de tipo `set`
+# y es de tipo `set`
+# b es de tipo `bool`
+};
+{
+using
+bool y;
+int z;
+in
+x = 10;
+println 1, x;
+println 2, y;
+println 3, z;
+# inicializado en false;
+# inicializado en 0
+# x es de tipo `int`
+# y es de tipo `bool`
+# z es de tipo `int`
+};
+for i max y do
+print (i+x), " ";
+println "";
+# usa `i` del for y `x` del bloque principal
+# sólo para el salto de línea
+for i min {7, 5, 8, 3, 9, 6, 4, 2, 1, 0} do {
+using
+bool i;
+# esconde la variable `i` del for
+in
+print i, " ";
+# siempre imprime `false`
+i = false;
+};
+println "";
+# sólo para el salto de línea
 }

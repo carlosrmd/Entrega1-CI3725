@@ -1,3 +1,3 @@
 Primera entrega del proyecto de CI3725.
 
-Analizador lexicográfico en progreso.
+Analizador lexicográfico del lenguaje Setlan.
