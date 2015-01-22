@@ -1,0 +1,181 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#	TRADUCTORES E INTERPRETADORES CI3725
+#	Primera entrega del proyecto
+#	Autores: Carlos Martínez 	- 11-10584
+#			 Christian Teixeira - 11-10584
+
+
+import ply.lex as lex
+
+tokens = (
+		'PROGRAM',
+		'OPENCURLY',
+		'CLOSECURLY',
+		'OPENPAREN',
+		'CLOSEPAREN',
+		'PRINT',
+		'PRINTLN',
+		'IN',
+		'USING',
+		'INT',
+		'BOOL',
+		'SCAN',
+		'ID',
+		'COMMA',
+		'DOT',
+		'SEMICOLON',
+		'COLON',
+		'EQUAL',
+		'STRING',
+		'PLUS',
+		'MINUS',
+		'IF',
+		'ELSE',
+		'TRUE',
+		'OR',
+		'AND',
+		'NOT',
+		'FALSE',
+		'FOR',
+		'REPEAT',
+		'WHILE',
+		'DO',
+		'SET',
+		'LESSTHAN',
+		'GREATERTHAN',
+		'LESSTHANOREQUAL',
+		'GREATERTHANOREQUAL',
+		'EQUALS',
+		'NOTEQUALS',
+		'ASTERISK',
+		'DEF',
+		'RETURN',
+		'ARROW',
+		'SLASH',
+		'PERCENT',
+		'ARROBA',
+		'UNION',
+		'INTERSECTION',
+		'COMPLEMENT',
+		'SETSUM',
+		'SETREST',
+		'SETSUBSTRACT',
+		'SETMULT',
+		'SETDIV',
+		'SETMOD',
+		'SETMAX',
+		'SETMIN',
+		'SETLENGTH',
+		'NUMBER',
+		'TEXT',
+	)
+
+reserved = {
+	'program' : 'PROGRAM',
+	'print' : 'PRINT',
+	'println' : 'PRINTLN',
+	'using' : 'USING',
+	'int' : 'INT',
+	'bool' : 'BOOL',
+	'string' : 'STRING',
+	'scan' : 'SCAN',
+	'if' : 'IF',
+	'else' : 'ELSE',
+	'in' : 'IN',
+	'true' : 'TRUE',
+	'false' : 'FALSE',
+	'or' : 'OR',
+	'and' : 'AND',
+	'not' : 'NOT',
+	'for' : 'FOR',
+	'repeat' : 'REPEAT',
+	'while' : 'WHILE',
+	'do' : 'DO',
+	'set' : 'SET',
+	'def' : 'DEF',
+	'return' : 'RETURN',
+}
+
+t_OPENCURLY = r'\{'
+t_CLOSECURLY = r'\}'
+t_OPENPAREN = r'\('
+t_CLOSEPAREN = r'\)'
+t_PLUS    = r'\+'
+t_MINUS = r'-'
+t_SEMICOLON = r';'
+t_COLON = r':'
+t_COMMA = r','
+t_DOT = r'\.'
+t_EQUAL = r'='
+t_ARROW = r'->'
+t_GREATERTHAN = r'>'
+t_LESSTHAN = r'<'
+t_GREATERTHANOREQUAL = r'>='
+t_LESSTHANOREQUAL = r'<='
+t_EQUALS = r'=='
+t_NOTEQUALS = r"/="
+t_ASTERISK = r'\*'
+t_ARROBA = r'@'
+t_SLASH = r'/'
+t_PERCENT = r'%'
+t_UNION = r'\+\+'
+t_INTERSECTION = r'><'
+t_COMPLEMENT = r'\\'
+t_SETSUM = r'<\+>'
+t_SETSUBSTRACT = r'<->'
+t_SETMULT = r'<\*>'
+t_SETDIV = r'</>'
+t_SETMOD = r'<%>'
+t_SETMAX = r'>\?'
+t_SETMIN = r'<\?'
+t_SETLENGTH = r'\$\?'
+
+t_ignore  = ' |\t'
+
+def t_NUMBER(t):
+    r'\d+'
+    t.value = int(t.value)    
+    return t
+
+def t_TEXT(t):
+    r'["\'][a-zA-Z0-9 \t.,:;!=()¿?<>¡!/&%$#]*["\']'
+    t.type = reserved.get(t.value,'TEXT')
+    return t
+
+def t_ID(t):
+	r'[a-zA-Z][a-zA-Z0-9_]*'
+	t.type = reserved.get(t.value,'ID')
+	return t
+
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+def t_ignore_comment(t):
+	r'\#.*'
+	pass
+
+def t_ERROR(t):
+	print("ERROR: Illegal character: " + str(t.value[0]))
+	t.lexer.skip(1)
+
+
+lexer = lex.lex()
+archivo = open("papas.txt", "r")
+contenido = archivo.read()
+print(contenido)
+lexer.input(contenido)
+out = ""
+first = True
+while True:
+	tok = lexer.token()
+	if not tok: break
+	if not first: out = out + "\n"
+	first = False
+	if(tok.type == "TEXT" or tok.type == "ID"):
+		out = out + "Token" + str(tok.type) + ": " + tok.value + " (Línea " + str(tok.lineno) + ", Columna " + str(tok.lexpos) + ")"
+	else:
+		out = out + "Token" + str(tok.type) + "(Línea " + str(tok.lineno) + ", Columna " + str(tok.lexpos) + ")"
+print(out)
