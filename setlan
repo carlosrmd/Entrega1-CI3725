@@ -11,6 +11,8 @@
 
 import ply.lex as lex
 
+# Declaración de tokens
+
 tokens = (
 		'PROGRAM',
 		'LCURLY',
@@ -73,6 +75,8 @@ tokens = (
 		'INTEGER',
 	)
 
+# Diccionario de reserveds
+
 reserved = {
 	'program' : 'PROGRAM',
 	'print' : 'PRINT',
@@ -97,6 +101,8 @@ reserved = {
 	'def' : 'DEF',
 	'return' : 'RETURN',
 }
+
+# Reglas simples para reconocer los tokens
 
 t_LCURLY = r'\{'
 t_RCURLY = r'\}'
@@ -133,6 +139,8 @@ t_SETMIN = r'<\?'
 t_SETLENGTH = r'\$\?'
 t_ignore  = ' |\t'
 
+# Reglas más complicadas que requieren de función
+
 def t_INTEGER(t):
     r'\d+'
     t.value = int(t.value)    
@@ -163,9 +171,13 @@ def t_ignore_comment(t):
 	r'\#.*'
 	pass
 
+# Función que atrapa expresiones no reconocidas
+
 def t_error(t):
-	error.append(t)
+	error.append(t)  # Se incluyen en la lista de error
 	t.lexer.skip(1)
+
+# main del programa
 
 def main(argv  = None):
 	import sys
@@ -185,20 +197,22 @@ def main(argv  = None):
 	lexer = lex.lex()
 	lexer.input(contenido)
 
+	# Loop para extraer tokens correctos
+
 	while True:
 		tok = lexer.token()
 		if not tok: break
-		out.append(tok)
+		out.append(tok)		# Se incluyen en la lista de out
 
 	# Imprimir resultados
 
-	if len(error) == 0:
+	if len(error) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		for t in out:
 			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT"):
 				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
 			else:
 				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
-	else:
+	else:				# Lista de error no vacía, se imprimen solo los tokens de error encontrados
 		for t in error:
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ".")
 
