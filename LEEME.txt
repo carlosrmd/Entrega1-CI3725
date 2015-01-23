@@ -25,6 +25,6 @@ Problemas presentes:
 	con respecto a las demás.
 
 Comentarios finales:
-	Hubo que utilizar algo que por lo general no me gusta hac que es
+	Hubo que utilizar algo que por lo general no me gusta hacer que es
 	declarar una variable como global, esta es la variable 'error'.
 	Sin embargo, en este proyecto eso no debería traer ningún inconveniente.
