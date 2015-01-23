@@ -172,7 +172,7 @@ def main(argv  = None):
 	if(argv is None):
 		argv = sys.argv
 	if(len(argv) == 1):
-		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo]")
+		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.")
 		exit(1)
 
 	global error
