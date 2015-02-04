@@ -28,9 +28,7 @@ tokens = (
 		'SCAN',
 		'IDENTIFIER',
 		'COMMA',
-		'DOT',
 		'SEMICOLON',
-		'COLON',
 		'ASSIGN',
 		'STRING',
 		'PLUS',
@@ -56,7 +54,6 @@ tokens = (
 		'ASTERISK',
 		'DEF',
 		'RETURN',
-		'ARROW',
 		'INTDIV',
 		'PERCENT',
 		'ARROBA',
@@ -73,6 +70,8 @@ tokens = (
 		'SETMIN',
 		'SETLENGTH',
 		'INTEGER',
+		'MIN',
+		'MAX',
 	)
 
 # Diccionario de reserveds
@@ -100,6 +99,8 @@ reserved = {
 	'set' : 'SET',
 	'def' : 'DEF',
 	'return' : 'RETURN',
+	'min' : 'MIN',
+	'max' : 'MAX'
 }
 
 # Reglas simples para reconocer los tokens
@@ -111,11 +112,8 @@ t_RPAREN = r'\)'
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_SEMICOLON = r';'
-t_COLON = r':'
 t_COMMA = r','
-t_DOT = r'\.'
 t_ASSIGN = r'='
-t_ARROW = r'->'
 t_GREATERTHAN = r'>'
 t_LESSTHAN = r'<'
 t_GTOREQUAL = r'>='
@@ -208,7 +206,7 @@ def main(argv  = None):
 
 	if len(error) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		for t in out:
-			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT"):
+			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
 				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
 			else:
 				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
