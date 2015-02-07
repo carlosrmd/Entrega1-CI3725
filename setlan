@@ -203,7 +203,7 @@ def main(argv  = None):
 	nombreArchivo = argv[1]
 	archivo = open(nombreArchivo, "r")
 	lineas = archivo.readlines()
-	archivo = open(nombreArchivo, "r")
+	archivo.seek(0)
 	contenido = archivo.read()
 	print(lineas)
 	lexer = lex.lex()
