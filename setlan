@@ -146,6 +146,12 @@ def t_INTEGER(t):
 
 def t_STRING(t):
     r'"(?:[^"\\]|\\.)*"'
+    i = 0
+    while(i < len(t.value)):
+    	if(t.value[i] == '\n'):
+    		error.append(t)
+    		break
+    	i = i + 1
     while t.value.count(r'\"') > 0 :
         if t.value.count(r'\"') > 0:
             t.value = t.value[:t.value.find(r'\"')] + t.value[t.value.find(r'\"')+1:]
@@ -177,6 +183,12 @@ def t_error(t):
 
 # main del programa
 
+def getcol(lineas, token):
+	aux = 0
+	for i in range(token.lineno-1):
+		aux = aux + len(lineas[i])
+	return str(token.lexpos - aux + 1)
+
 def main(argv  = None):
 	import sys
 	if(argv is None):
@@ -190,8 +202,10 @@ def main(argv  = None):
 	out = []
 	nombreArchivo = argv[1]
 	archivo = open(nombreArchivo, "r")
+	lineas = archivo.readlines()
+	archivo = open(nombreArchivo, "r")
 	contenido = archivo.read()
-
+	print(lineas)
 	lexer = lex.lex()
 	lexer.input(contenido)
 
@@ -207,9 +221,9 @@ def main(argv  = None):
 	if len(error) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		for t in out:
 			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
-				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
+				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
 			else:
-				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + str(t.lexpos))
+				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
 	else:				# Lista de error no vacía, se imprimen solo los tokens de error encontrados
 		for t in error:
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ".")
