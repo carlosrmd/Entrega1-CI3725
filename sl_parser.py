@@ -5,7 +5,7 @@
 #	Primera entrega del proyecto.             #
 #   Lexer para el lenguaje Setlan             #
 #	Autores: Carlos Martínez 	- 11-10584    #
-#			 Christian Teixeira - 11-10584    #
+#			 Christian Teixeira - 11-11016    #
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 import ply.yacc as yacc
