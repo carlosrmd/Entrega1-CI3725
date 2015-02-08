@@ -1,0 +1,7 @@
+--> Ejemplo de Calculadora (lex y yacc juntos): http://www.dabeaz.com/ply/example.html
+
+--> Definicion e imagen de un AST: http://en.wikipedia.org/wiki/Abstract_syntax_tree
+
+--> Construccion del AST: http://www.dabeaz.com/ply/ply.html#ply_nn34
+
+--> Construccion de parsers y compiladores con PLY (mira la pagina 55 que ponen un ejemplo de como hacer el AST usando listas de python): http://www.dabeaz.com/ply/PLYTalk.pdf
