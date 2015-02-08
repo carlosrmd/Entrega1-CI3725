@@ -1,0 +1,16 @@
+CAMBIOS
+
+- Variables globales "error_lex" y "error_par" en archivo "setlan" para los errores del lexer y el parser respectivamente
+- Las variables se actualizaran con una llamada al metodo "get_errors()" de "sl_lexer" y "sl_parser" respectivamente
+- Solucionado bug en "setlan" en que en caso de error del lexer, no mostraba correctamente la columna
+- Funciones "build_parser()" y "get_errors()" creadas en "sl_parser" 
+
+
+Por hacer (Carlos)
+
+- Averiguar como llamar al parser desde "setlan" con lo hecho por el lexer y que parametros pasarle si son necesarios
+- Mostrar errores del parser, si los hay, en la salida del "setlan"
+
+Por hacer (Christian)
+
+- Terminar la gramatica

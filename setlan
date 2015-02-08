@@ -27,17 +27,23 @@ def main(argv  = None):
 		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.")
 		exit(1)
 
-	global error
-	error = []
+	global error_lex
+	global error_par
+	error_lex = []
+	error_par = []
 	out = []
 
 	nombreArchivo = argv[1]
 	archivo = open(nombreArchivo, "r")
 	lineas = archivo.readlines()
 	archivo.seek(0)
-
 	contenido = archivo.read()
+
 	lexer = sl_lexer.build_lexer(contenido)
+	error_lex = sl_lexer.get_errors()
+
+	# parser = sl_parser.build_parser()
+	# error_par = sl_parser.get_errors()
 
 	# Loop para extraer tokens correctos
 
@@ -56,7 +62,7 @@ def main(argv  = None):
 				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
 	else:				# Lista de error no vacía, se imprimen solo los tokens de error encontrados
 		for t in error:
-			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + str(t.lexpos) + ".")
+			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + getcol(lineas, t) + ".")
 
 if __name__ == "__main__":
 	main()

@@ -10,6 +10,8 @@
 
 import ply.lex as lex
 
+error = []
+
 # Declaración de tokens
 
 tokens = (
@@ -177,6 +179,7 @@ def t_ignore_comment(t):
 # Función que atrapa expresiones no reconocidas
 
 def t_error(t):
+	global error
 	error.append(t)  # Se incluyen en la lista de error
 	t.lexer.skip(1)
 
@@ -184,3 +187,6 @@ def build_lexer(contenido):
 	lexer = lex.lex()
 	lexer.input(contenido)
 	return lexer
+
+def get_errors():
+	return error
