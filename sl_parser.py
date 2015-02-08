@@ -92,4 +92,8 @@ def p_elements(p):
 		p[0] = [p[1]] + [p[3]]
 
 def p_error(p):
-	print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + str(".")
+	print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + str("."))
+
+def build_parser():
+	parser = yacc.yacc()
+	return parser

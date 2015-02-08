@@ -1,0 +1,81 @@
+expr -> INTEGER
+	 |	IDENTIFIER
+	 |	MINUS expr
+	 |	expr expr expr
+	 |	LPAREB expr RPAREN
+
+opr ->	PLUS
+	|	MINUS
+	|	ASTERISK
+	|	INTDIV
+	|	PERCENT
+
+setexp ->	set
+		|	set setopr set
+		|	INTEGER mapopr set
+		|	unaryopr set
+
+set ->	IDENTIFIER
+	|	LCURLY setelem RCURLY
+
+setelem ->	expr
+		|	setelem COMMA expr
+
+setopr ->	UNION
+		|	INTERSECTION
+		|	COMPLEMENT
+
+mapopr ->	SETSUM
+		|	SETSUBSTRACT
+		|	SETMULT
+		|	SETDIV
+		|	SETMOD
+
+unaryop ->	SETMAX
+		|	SETMIN
+		|	SETLENGTH
+
+boolexpr ->	IDENTIFIER
+		 |	boolexpr logopr boolexpr
+		 |	INTEGER cmpopr INTEGER
+		 |	set egopr set
+		 |	LPAREN boolexpr RPAREN
+		 |	NOT boolexpr
+		 |	INTEGER ARROBA set
+
+logopr ->	AND
+		|	OR
+
+cmpopr ->	LESSTHAN
+		|	GREATERTHAN
+		|	LTOREQUAL
+		|	GTOREQUAL
+		|	egopr
+
+egopr ->	EQUAL
+	  |		NOTEQUAL
+
+using ->	USING vardec IN
+
+vardec ->	type vars SEMICOLON vardec
+		|	type vars SEMICOLON
+
+vars ->	IDENTIFIER COMMA vars
+	 |	IDENTIFIER
+
+assign ->	IDENTIFIER ASSIGN assignexpr SEMICOLON
+
+assignexpr ->	expr
+			|	setexpr
+			|	boolexpr
+
+scan ->	SCAN IDENTIFIER
+
+condition ->	IF LPAREN boolexpr RPAREN p_block
+		  |		IF LPAREN boolexpr RPAREN LCURLY p_block RCURLY
+		  |		IF LPAREN boolexpr RPAREN p_block ELSE LCURLY boolexpr RCURLY
+		  |		IF LPAREN boolexpr RPAREN p_block ELSE condition
+
+
+
+loop ->	WHILE 
