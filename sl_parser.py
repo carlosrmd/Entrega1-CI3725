@@ -91,6 +91,49 @@ def p_elements(p):
 	else:
 		p[0] = [p[1]] + [p[3]]
 
+def p_expr_simple(p):
+	'''expr : INTEGER
+			| IDENTIFIER
+			| LPAREN expr RPAREN
+			| MINUS expr %prec UMINUS'''
+	if len(p) == 2: p[0] = p[1]
+	elif p[1] == '-': p[0] = -p[2]
+	else: p[0] = p[2]
+
+def p_expr_binopr(p):
+	'''expr : expr PLUS expr
+			| expr MINUS expr
+			| expr ASTERISK expr
+			| expr INTDIV expr
+			| expr PERCENT expr'''
+	if p[2] == '+': p[0] = p[1] + p[3]
+	elif p[2] == '-': p[0] = p[1] - p[3]
+	elif p[2] == '*': p[0] = p[1] * p[3]
+	elif p[2] == '/': p[0] = p[1] / p[3]
+	elif p[2] == '%': p[0] = p[1] % p[3]
+
+def p_set(p):
+	'''set : LCURLY setelem RCURLY
+		   | IDENTIFIER'''
+	if len(p) == 2: p[0] = p[1]
+	else: p[0] = p[2]
+
+def p_setelem(p):
+	'''setelem : expr
+			   | setelem COMMA expr'''
+	if len(p) == 2: p[0] = p[1]
+	else: 
+		if p[3] not in [1]: p[0] = p[1], p[3]
+		else: p[0] = p[1]
+
+def p_setexpr_binopr(p):
+	'''setexpr : set
+			   | setexpr UNION set
+			   | setexpr INTERSECTION set
+			   | setexpr COMPLEMENT set'''
+	if len(p) == 2: p[0] = p[1]
+	#elif p[2] == '++': p
+
 def p_error(p):
 	print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + str("."))
 
