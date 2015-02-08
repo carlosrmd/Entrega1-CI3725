@@ -9,7 +9,6 @@
 #			 Christian Teixeira - 11-10584    #
 # # # # # # # # # # # # # # # # # # # # # # # #
 
-import ply.lex as lex
 import sl_lexer
 
 # main del programa
@@ -31,10 +30,12 @@ def main(argv  = None):
 	global error
 	error = []
 	out = []
+
 	nombreArchivo = argv[1]
 	archivo = open(nombreArchivo, "r")
 	lineas = archivo.readlines()
 	archivo.seek(0)
+
 	contenido = archivo.read()
 	lexer = sl_lexer.build_lexer(contenido)
 
