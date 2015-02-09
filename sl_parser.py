@@ -27,7 +27,11 @@ class Node:
 		self.val = val
 
 	def __str__(self):
-		return str(self.val)
+		s = str(val) + "\n"
+		if children:
+			for child in children:
+				s = s + "\t" + str(child) + "\n"
+		return s
 
 # PARSER
 
@@ -106,25 +110,39 @@ def p_vardec(p):
 	for var in p[2]:
 		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var))]
 	if len(p) == 5:
-		p[0] = p[1] + p[0]
+		p[0] = p[0] + p[1]
 
 def p_type(p):
 	'''type : INT
 			| BOOL
 			| SET'''
-	p[0] = p[1]
+	p[0] = Node("type", None, str(p[1]))
 
 def p_var_list(p):
 	'''var_list : IDENTIFIER
 				| var_list COMMA IDENTIFIER'''
-	p[0] = [p[1]]
+	p[0] = [Node("variable", None, str(p[1]))]
 	if len(p) == 4:
-		p[0] = p[1] + p[0]
+		p[0] = p[0] + p[1]
+
+def p_assign(p):
+	'''assign : IDENTIFIER ASSIGN assign_expr SEMICOLON'''
+	p[0] = Node("assign", [Node("var_stmt", [Node("variable", None, str(p[1]))], "variable"), Node("value", [p[3]], "value")], "ASSIGN")
+
+def p_assign_expr(p):
+	'''asign_expr : expr
+				  | setexpr
+				  | boolexpr'''
+	p[0] = [1]
+
+def p_scan(p):
+	'''scan : SCAN IDENTIFIER'''
+	p[0] = Node("scan", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable")], "SCAN")
 
 def p_print(p):
 	'''print : PRINT elements SEMICOLON
 			 | PRINTLN elements SEMICOLON'''
-	p[0] = Node("print", [p[2]], "PRINT")
+	p[0] = Node("print", [Node("elem_stmt", p[2], "elements")], "PRINT")
 
 def p_elements(p):
 	'''elements : expr
@@ -132,10 +150,13 @@ def p_elements(p):
 				| boolexpr
 				| STRING
 				| elements COMMA elements'''
-	if len(p) == 2:
-		p[0] = p[1]
-	else:
-		p[0] = [p[1]] + [p[3]]
+	p[0] = []
+	if p[1] = 'STRING':
+		p[0] = [Node("str_stmt", [Node("string", None, "\"" + str(p[1]) + "\"")], "string")]
+	elif len(p) == 2:
+		p[0] = [p[1]]
+	elif len(p) == 4:
+		p[0] = p[1] + p[3]
 
 def p_expr_simple(p):
 	'''expr : INTEGER
