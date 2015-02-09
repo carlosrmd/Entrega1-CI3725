@@ -11,8 +11,25 @@
 import ply.yacc as yacc
 from sl_lexer import tokens
 
-error = []
+# Variable global error_par
 
+error_par = []
+
+# Definicion de la clase Nodo utilizada para la construccion del AST
+
+class Node:
+	def __init__(self, type, children=None, val=None):
+		self.type = type
+		if children: 
+			self.children = children
+		else:
+			self.children = []
+		self.val = val
+
+	def __str__(self):
+		return str(self.val)
+
+# PARSER
 
 # Precedencia entre operadores, de menor a mayor
 
@@ -44,27 +61,29 @@ precedence = (
 	('nonassoc', 'SETMAX', 'SETMIN', 'SETLENGTH'),
 )
 
+# Reglas de la gramatica
+
 def p_program(p):
-	'''program : PROGRAM line
+	'''program : PROGRAM one_line
 			   | PROGRAM LCURLY start R_CURLY'''
 	if len(p) == 3:
-		p[0] = p[2]
+		p[0] = Node("program", [p[2]], "PROGRAM")
 	else:
-		p[0] = p[3]
+		p[0] = Node("program", [p[3], Node("block_end", None, "BLOCK_END")], "PROGRAM")
 
 def p_empty(p):
 	'empty :'
 	pass
 
-def p_line(p):
-	'line : print'
+def p_one_line(p):
+	'one_line : print'
 	p[0] = p[1]
 
 def p_start(p):
-	'''start : print start
-			 | using block
+	'''start : using block
 			 | empty'''
-	p[0] = p[1]
+	if len(p) == 3:
+		p[0] = Node("block", [p[1], Node("in", None, "IN")] + p[2], "BLOCK")
 
 def p_block(p):
 	'''block : assign block
@@ -73,12 +92,39 @@ def p_block(p):
 			 | loop block
 			 | print block
 			 | empty'''
+	if len(p) == 3:
+		p[0] = [p[1]]+p[2]
+
+def p_using(p):
+	'''using : USING vardec IN'''
+	p[0] = Node("using", p[2], "USING")
+
+def p_vardec(p):
+	'''vardec : type var_list SEMICOLON
+			  | vardec type var_list SEMICOLON'''
+	p[0] = []
+	for var in p[2]:
+		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var))]
+	if len(p) == 5:
+		p[0] = p[1] + p[0]
+
+def p_type(p):
+	'''type : INT
+			| BOOL
+			| SET'''
 	p[0] = p[1]
+
+def p_var_list(p):
+	'''var_list : IDENTIFIER
+				| var_list COMMA IDENTIFIER'''
+	p[0] = [p[1]]
+	if len(p) == 4:
+		p[0] = p[1] + p[0]
 
 def p_print(p):
 	'''print : PRINT elements SEMICOLON
 			 | PRINTLN elements SEMICOLON'''
-	p[0] = p[2]
+	p[0] = Node("print", [p[2]], "PRINT")
 
 def p_elements(p):
 	'''elements : expr
