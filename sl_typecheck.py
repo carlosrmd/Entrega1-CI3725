@@ -23,6 +23,7 @@ num_scopes = 0
 
 def build_symbol_table(AST):
 	global symbol_table
+	global num_scopes
 
 	if AST.type == "block": num_scopes += 1
 	elif AST.type == "vardec":
@@ -40,10 +41,9 @@ def build_symbol_table(AST):
 		if not symbol_table.insert(name, dec_scope, type, val, vis_scope):
 			error_st.append(("redec", name))
 
-
 	if AST.children:
 		for child in AST.children:
 			build_symbol_table(child)
 
-def print_simbol_table():
-	print(str(symbol_table))
+def tostring_symbol_table():
+	return str(symbol_table.st)
