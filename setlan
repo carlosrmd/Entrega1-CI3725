@@ -24,7 +24,10 @@ def main(argv  = None):
 	if(argv is None):
 		argv = sys.argv
 	if(len(argv) == 1):
-		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.")
+		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo] [-t -a -s]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.")
+		exit(1)
+	if argv[1][0] == "-":
+		print("ERROR: Primer argumento debe ser el nombre del archivo, no un flag.")
 		exit(1)
 
 	global error_lex
@@ -53,19 +56,26 @@ def main(argv  = None):
 		out.append(tok)		# Se incluyen en la lista de out
 
 	# Imprimir resultados
-
 	if len(error_lex) == 0:	# Lista de error vacía, se imprimen los tokens correctos
-		for t in out:
-			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
-				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
-			else:
-				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
+		if "-t" in argv:
+			print("Tokens list\n")
+			for t in out:
+				if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
+					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
+				else:
+					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
 	else:				# Lista de error no vacía, se imprimen solo los tokens de error encontrados
 		for t in error_lex:
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + getcol(lineas, t) + ".")
 			exit(0)
 	parser = sl_parser.build_parser()
-	print(parser.parse(contenido))
+	ast = parser.parse(contenido)
+	if "-a" in argv:
+		print("\nAST\n")
+		print(ast)
+
+	if "-s" in argv:
+		print("Symbol Table\n")
 
 
 if __name__ == "__main__":
