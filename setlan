@@ -9,7 +9,7 @@
 #			 Christian Teixeira - 11-11016    #
 # # # # # # # # # # # # # # # # # # # # # # # #
 
-import sl_lexer, sl_parser
+import sl_lexer, sl_parser, sl_typecheck
 
 # main del programa
 
@@ -58,7 +58,7 @@ def main(argv  = None):
 	# Imprimir resultados
 	if len(error_lex) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		if "-t" in argv:
-			print("Tokens list\n")
+			print("\nTokens List:\n")
 			for t in out:
 				if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
 					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
@@ -69,13 +69,17 @@ def main(argv  = None):
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + getcol(lineas, t) + ".")
 			exit(0)
 	parser = sl_parser.build_parser()
-	ast = parser.parse(contenido)
-	if "-a" in argv:
-		print("\nAST\n")
-		print(ast)
+	AST = parser.parse(contenido)
+	if sl_parser.get_errors(): error_par = sl_parser.get_errors()
+	if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
+		p = error_par[0]
+		print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno - number_lines) + ", columna " + getcol(lineas, p, number_lines) + ".")
+	if AST and "-a" in argv:
+		print("\nAST:\n")
+		print(AST)
 
-	if "-s" in argv:
-		print("Symbol Table\n")
+		if "-s" in argv:
+			print("\nSymbol Table:\n")
 
 
 if __name__ == "__main__":

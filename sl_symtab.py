@@ -10,55 +10,74 @@
 
 class SymTab:
 	
+	# Se implementa la Tabla de Simbolos utilizando para ello
+	# la estructura 'dict' de python. Cada entrada esta
+	# compuesta de dos tuplas: la clave es una tupla
+	# (name, dec_scope), y el valor es una tupla
+	# (type, val, vis_scope). A continuacion
+	# el significado de estos atributos:
+
+	# name: nombre de la variable (identificador)
+	# type: tipo de la variable (int, set, bool)
+	# val: valor inicial de la variable (0, false, {})
+	# dec_scope: nro. de scope donde se declara la variable
+	# vis_scope: lista de nro. de scope donde es visible la variable
+
 	def __init__(self):
 		self.st = {}
 
-	def insert(self, name, type, val, scope):
-		if not self.contains(name, scope):
-			self.st[(name, scope)] = (type, val)
+	def insert(self, name, dec_scope, type, val, vis_scope):
+		if not self.contains(name, dec_scope):
+			self.st[(name, dec_scope)] = (type, val, vis_scope)
 			return True
 		else:
 			return False
 
-	def delete(self, name, type, val, scope):
-		if self.contains(name, scope) and self.st[(name, scope)] == (type, val):
-			del self.st[(name, scope)]
+	def delete(self, name, dec_scope, type, val, vis_scope):
+		if self.contains(name, dec_scope) and self.st[(name, dec_scope)] == (type, val, vis_scope):
+			del self.st[(name, dec_scope)]
 			return True
 		else:
 			return False
 
-	def update(self, name, type, val, scope):
-		if self.contains(name, scope):
-			self.st[(name, scope)] = (type, val)
+	def update(self, name, dec_scope, type, val, vis_scope):
+		if self.contains(name, dec_scope):
+			self.st[(name, dec_scope)] = (type, val, vis_scope)
 			return True
 		else:
 			return False
 
-	def contains(self, name, scope):
-		return (name, scope) in self.st.keys()
+	def contains(self, name, dec_scope):
+		return (name, dec_scope) in self.st.keys()
 
-	def lookup(self, name, scope):
-		if self.contains(name, scope):
-			return self.st[(name, scope)]
+	def lookup(self, name, dec_scope):
+		if self.contains(name, dec_scope):
+			return self.st[(name, dec_scope)]
 		else:
 			return False
 
-	def typeof(self, name, scope):
-		if self.contains(name, scope):
-			return self.st[(name, scope)][0]
+	def typeof(self, name, dec_scope):
+		if self.contains(name, dec_scope):
+			return self.st[(name, dec_scope)][0]
 		else:
 			return False
 
-	def valof(self, name, scope):
-		if self.contains(name, scope):
-			return self.st[(name, scope)][1]
+	def valof(self, name, dec_scope):
+		if self.contains(name, dec_scope):
+			return self.st[(name, dec_scope)][1]
 		else:
 			return False
 
-	def var_str(self, name, scope):
-		if self.contains(name, scope):
-			type = self.typeof(name, scope)
-			val = self.valof(name, scope)
+	def vis_scopeof(self, name, dec_scope):
+		if self.contains(name, dec_scope):
+			return self.st[(name, dec_scope)][2]
+		else:
+			return False
+
+	def var_str(self, name, dec_scope):
+		if self.contains(name, dec_scope):
+			type = self.typeof(name, dec_scope)
+			val = self.valof(name, dec_scope)
 			return "Variable: " + name + "\t| Type: " + type + "\t| Value: " + str(val)
 		else:
 			return False
