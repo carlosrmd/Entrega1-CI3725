@@ -13,9 +13,9 @@ import sl_lexer, sl_parser, sl_typecheck
 
 # main del programa
 
-def getcol(lineas, token):
+def getcol(lineas, token, number_lines=0):
 	aux = 0
-	for i in range(token.lineno-1):
+	for i in range(token.lineno-number_lines-1):
 		aux = aux + len(lineas[i])
 	return str(token.lexpos - aux + 1)
 
@@ -56,6 +56,7 @@ def main(argv  = None):
 		out.append(tok)		# Se incluyen en la lista de out
 
 	# Imprimir resultados
+	number_lines = 0
 	if len(error_lex) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		if "-t" in argv:
 			print("\nTokens List:\n")
@@ -64,22 +65,29 @@ def main(argv  = None):
 					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
 				else:
 					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
-	else:				# Lista de error no vacía, se imprimen solo los tokens de error encontrados
+		number_lines = out[-1].lineno
+	else:				# Lista de error del lexer no vacía, se imprimen solo los tokens de error encontrados
 		for t in error_lex:
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + getcol(lineas, t) + ".")
-			exit(0)
+			number_lines = t.lineno
+		exit(0)
+	
 	parser = sl_parser.build_parser()
 	AST = parser.parse(contenido)
 	if sl_parser.get_errors(): error_par = sl_parser.get_errors()
 	if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
 		p = error_par[0]
 		print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno - number_lines) + ", columna " + getcol(lineas, p, number_lines) + ".")
-	if AST and "-a" in argv:
-		print("\nAST:\n")
-		print(AST)
+
+	if AST:
+		if "-a" in argv:
+			print("\nAST:\n")
+			print(AST)
 
 		if "-s" in argv:
+			sl_typecheck.build_symbol_table(AST)
 			print("\nSymbol Table:\n")
+			print(sl_typecheck.tostring_symbol_table())
 
 
 if __name__ == "__main__":
