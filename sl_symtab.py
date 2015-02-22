@@ -74,6 +74,9 @@ class SymTab:
 		else:
 			return False
 
+	def var_list(self):
+		return self.st.keys()
+
 	def var_str(self, name, dec_scope):
 		if self.contains(name, dec_scope):
 			type = self.typeof(name, dec_scope)
@@ -81,3 +84,43 @@ class SymTab:
 			return "Variable: " + name + "\t| Type: " + type + "\t| Value: " + str(val)
 		else:
 			return False
+
+	def __str__(self):
+		return str(self.st)
+
+
+
+class ST_Stack:
+
+	# Clase definicion de Pila de Symbol Tables
+
+	def __init__(self):
+		self.stack = []
+
+	def push(self, st):
+		if not isinstance(st, SymTab): return False
+		else:
+			self.stack.append(st)
+			return True
+
+	def pop(self):
+		if self.isempty(): return False
+		else: return self.stack.pop()
+
+	def top(self):
+		if self.isempty(): return False
+		else: return self.stack[-1]
+
+	def bottom(self):
+		if self.isempty(): return False
+		else: return self.stack[0]
+
+	def isempty(self):
+		return len(self.stack) == 0
+
+	def __str__(self):
+		s = ""
+		for i in self.stack:
+			s = s + str(i) + ", "
+		s = s[:-2]
+		return "[" + s + "]"

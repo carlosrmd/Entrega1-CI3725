@@ -87,6 +87,7 @@ def main(argv  = None):
 			print("")
 
 		if "-s" in argv:
+			#sl_typecheck.init_st_stack()
 			sl_typecheck.build_symbol_table(AST)
 			print("\nSymbol Table:\n")
 			print(sl_typecheck.tostring_symbol_table())
