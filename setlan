@@ -88,6 +88,8 @@ def main(argv  = None):
 			sl_typecheck.build_symbol_table(AST)
 			print("\nSymbol Table:\n")
 			print(sl_typecheck.tostring_symbol_table())
+	for child in AST.children:
+		print(child.type)
 
 
 if __name__ == "__main__":

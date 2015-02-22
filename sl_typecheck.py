@@ -24,22 +24,27 @@ num_scopes = 0
 def build_symbol_table(AST):
 	global symbol_table
 	global num_scopes
-
-	if AST.type == "block": num_scopes += 1
+	if AST.type == "vardec":
+		print("Val is " + AST.val)
+	if AST.type == "block":
+		num_scopes += 1
 	elif AST.type == "vardec":
 		vardec = str(AST.val)
 		type = vardec.split()[0]
-		var = vardec.split()[1]
-
-		name = str(var)
+		if "," in vardec:
+			var = vardec.split(type)[1].split(",")
+			for i in range(len(var)):
+				var[i] = var[i].split()[0]
+		else:		
+			var = [vardec.split()[1]]
 		dec_scope = num_scopes
 		if type == "int": val = "0"
 		elif type == "set": val = "{}"
 		elif type == "bool": val = "false"
 		vis_scope = [num_scopes]
-
-		if not symbol_table.insert(name, dec_scope, type, val, vis_scope):
-			error_st.append(("redec", name))
+		for name in var:
+			if not symbol_table.insert(name, dec_scope, type, val, vis_scope):
+				error_st.append(("redec", name))
 
 	if AST.children:
 		for child in AST.children:
