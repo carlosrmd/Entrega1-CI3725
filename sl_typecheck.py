@@ -25,6 +25,12 @@ def build_symbol_table(AST):
 	global symbol_table
 	global num_scopes
 
+	name = ""
+	def_scope = 0
+	type = ""
+	val = ""
+	vis_scope = []
+
 	if AST.type == "block": num_scopes += 1
 	elif AST.type == "vardec":
 		vardec = str(AST.val)

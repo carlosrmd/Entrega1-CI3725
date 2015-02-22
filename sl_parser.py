@@ -115,13 +115,9 @@ def p_using(p):
 def p_vardec(p):
 	'''vardec : type var_list SEMICOLON
 			  | type var_list SEMICOLON vardec'''
-	var_list = ""
-
+	p[0] = []
 	for var in p[2]:
-		var_list = var_list + var + ", "
-	var_list = var_list[:-2]
-	p[0] = [Node("vardec", None, str(p[1]) + " " + var_list)]
-
+		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var))]
 	if len(p) == 5: p[0] = p[0] + p[4]
 
 def p_type(p):

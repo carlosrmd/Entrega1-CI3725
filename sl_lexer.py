@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 #	TRADUCTORES E INTERPRETADORES CI3725      #
-#	Primera entrega del proyecto.             #
+#	Segunda entrega del proyecto.             #
 #   Lexer para el lenguaje Setlan             #
 #	Autores: Carlos Martínez 	- 11-10584    #
 #			 Christian Teixeira - 11-11016    #
@@ -10,7 +10,7 @@
 
 import ply.lex as lex
 
-error = []
+error_lex = []
 
 # Declaración de tokens
 
@@ -53,8 +53,8 @@ tokens = (
 		'EQUAL',
 		'NOTEQUAL',
 		'ASTERISK',
-		'DEF',
-		'RETURN',
+		#'DEF', #(NOT USED)
+		#'RETURN', #(NOT USED)
 		'INTDIV',
 		'PERCENT',
 		'ARROBA',
@@ -62,7 +62,7 @@ tokens = (
 		'INTERSECTION',
 		'COMPLEMENT',
 		'SETSUM',
-		'SETREST',
+		#'SETREST', #(NOT USED)
 		'SETSUBSTRACT',
 		'SETMULT',
 		'SETDIV',
@@ -75,7 +75,7 @@ tokens = (
 		'MAX',
 	)
 
-# Diccionario de reserveds
+# Diccionario de reservadas
 
 reserved = {
 	'program' : 'PROGRAM',
@@ -98,8 +98,8 @@ reserved = {
 	'while' : 'WHILE',
 	'do' : 'DO',
 	'set' : 'SET',
-	'def' : 'DEF',
-	'return' : 'RETURN',
+	#'def' : 'DEF', #(NOT USED)
+	#'return' : 'RETURN', #(NOT USED)
 	'min' : 'MIN',
 	'max' : 'MAX'
 }
@@ -179,8 +179,8 @@ def t_ignore_comment(t):
 # Función que atrapa expresiones no reconocidas
 
 def t_error(t):
-	global error
-	error.append(t)  # Se incluyen en la lista de error
+	global error_lex
+	error_lex.append(t)  # Se incluyen en la lista de error
 	t.lexer.skip(1)
 
 def build_lexer(contenido):
@@ -189,4 +189,4 @@ def build_lexer(contenido):
 	return lexer
 
 def get_errors():
-	return error
+	return error_lex
