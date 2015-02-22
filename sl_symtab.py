@@ -14,35 +14,35 @@ class SymTab:
 	# la estructura 'dict' de python. Cada entrada esta
 	# compuesta de dos tuplas: la clave es una tupla
 	# (name, dec_scope), y el valor es una tupla
-	# (type, val, vis_scope). A continuacion
+	# (type, val, lin_dec). A continuacion
 	# el significado de estos atributos:
 
 	# name: nombre de la variable (identificador)
 	# type: tipo de la variable (int, set, bool)
 	# val: valor inicial de la variable (0, false, {})
 	# dec_scope: nro. de scope donde se declara la variable
-	# vis_scope: lista de nro. de scope donde es visible la variable
+	# lin_dec: linea del programa en que se declaro la variable.
 
 	def __init__(self):
 		self.st = {}
 
-	def insert(self, name, dec_scope, type, val, vis_scope):
+	def insert(self, name, dec_scope, type, val, lin_dec):
 		if not self.contains(name, dec_scope):
-			self.st[(name, dec_scope)] = (type, val, vis_scope)
+			self.st[(name, dec_scope)] = (type, val, lin_dec)
 			return True
 		else:
 			return False
 
-	def delete(self, name, dec_scope, type, val, vis_scope):
-		if self.contains(name, dec_scope) and self.st[(name, dec_scope)] == (type, val, vis_scope):
+	def delete(self, name, dec_scope, type, val, lin_dec):
+		if self.contains(name, dec_scope) and self.st[(name, dec_scope)] == (type, val, lin_dec):
 			del self.st[(name, dec_scope)]
 			return True
 		else:
 			return False
 
-	def update(self, name, dec_scope, type, val, vis_scope):
+	def update(self, name, dec_scope, type, val, lin_dec):
 		if self.contains(name, dec_scope):
-			self.st[(name, dec_scope)] = (type, val, vis_scope)
+			self.st[(name, dec_scope)] = (type, val, lin_dec)
 			return True
 		else:
 			return False
@@ -68,7 +68,7 @@ class SymTab:
 		else:
 			return False
 
-	def vis_scopeof(self, name, dec_scope):
+	def lin_decof(self, name, dec_scope):
 		if self.contains(name, dec_scope):
 			return self.st[(name, dec_scope)][2]
 		else:
