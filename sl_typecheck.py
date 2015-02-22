@@ -10,6 +10,8 @@
 
 from sl_symtab import SymTab, ST_Stack
 
+lineas = []
+
 # Tipos de Errores detectados en esta etapa:
 
 # "redec": Redeclaracion de variable en el mismo alcance
@@ -19,13 +21,18 @@ from sl_symtab import SymTab, ST_Stack
 # "read_ol": Asignacion a una variable read_only (de un FOR)
 
 error_st = []
+strrep_st = ""
 num_scopes = 0
+indent_level = 0
 st_stack = ST_Stack()
 symbol_table_final = SymTab()
 
+
 def build_symbol_table(AST):
 	global st_stack
+	global strrep_st
 	global num_scopes
+	global indent_level
 
 	# Inicializacion de los parametros de la entrada a la tabla de simbolos
 	name = ""
@@ -33,11 +40,14 @@ def build_symbol_table(AST):
 	type = ""
 	val = ""
 	lin_dec = 0
+	col_dec = 0
 
 	# Tipos AST de declaracion de variables, apertura y cierre de Scopes
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	if AST.type == "block": 
 		num_scopes += 1
+		strrep_st = strrep_st + "\t"*indent_level + "SCOPE" + "\n"
+		indent_level += 1
 
 	elif AST.type == "using":
 		st = SymTab()
@@ -54,29 +64,38 @@ def build_symbol_table(AST):
 		elif type == "set": val = "{}"
 		elif type == "bool": val = "false"
 		lin_dec = AST.lineno
+		col_dec = AST.colno
 
 		if not st_stack.top().insert(name, dec_scope, type, val, lin_dec):
-			error_st.append(("redec", name))
+			error_st.append(("redec", name, lin_dec, col_dec))
+
+		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
 
 	elif AST.type == "for_stmt":
 		num_scopes += 1
 		st = SymTab()
 		st_stack.push(st)
 
+		strrep_st = strrep_st + "\t"*indent_level + "SCOPE" + "\n"
+		indent_level += 1
+
 		name = str(AST.children[0].children[0].val)
 		dec_scope = num_scopes
 		type = "int"
 		val = "0"
 		lin_dec = AST.lineno
+		read_only = 1
 
-		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
+		st_stack.top().insert(name, dec_scope, type, val, lin_dec, read_only)
+
+		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
 
 	elif AST.type == "block_end":
 		pop_stack_to_st()
 
 	# Tipos AST de asignacion de variables y evaluacion de expresiones
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
-	
+
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -89,12 +108,42 @@ def build_symbol_table(AST):
 
 
 def pop_stack_to_st():
+	global strrep_st
+	global indent_level
 	st = st_stack.pop()
 	for key in st.var_list():
 		value = st.lookup(key[0], key[1])
 		symbol_table_final.insert(key[0], key[1], value[0], value[1], value[2])
+	if indent_level >= 1: indent_level -= 1
+	strrep_st = strrep_st + "\t"*indent_level + "END_SCOPE" + "\n"
+
+
+def getcol(numlineas, numcolumna):
+	aux = 0
+	for i in range(numlineas - 1):
+		aux = aux + len(lineas[i])
+	return str(numcolumna - aux + 1)
+
+
+def report_st_errors():
+	s = ""
+	for i in error_st:
+		if i[0] == "redec":
+			s = s + "Error en la linea " + str(i[2]) + ", columna " + getcol(i[2], i[3]) + ": La variable '" + str(i[1]) + "' ya ha sido declarada en este alcance."
+		elif i[0] == "nodec":
+			pass
+		elif i[0] == "inv_tex":
+			pass
+		elif i[0] == "inv_opr":
+			pass
+		elif i[0] == "read_ol":
+			pass
+		s = s + "\n"
+	return s
 
 
 def tostring_symbol_table():
 	#return str(st_stack)
-	return str(symbol_table_final.st)
+	#return str(symbol_table_final.st)
+	if len(error_st) == 0: return strrep_st
+	else: return report_st_errors()

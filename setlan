@@ -11,9 +11,11 @@
 
 import sl_lexer, sl_parser, sl_typecheck
 
+lineas = []
+
 # main del programa
 
-def getcol(lineas, token):
+def getcol(token):
 	aux = 0
 	for i in range(token.lineno-1):
 		aux = aux + len(lineas[i])
@@ -32,6 +34,7 @@ def main(argv  = None):
 
 	global error_lex
 	global error_par
+	global lineas
 	error_lex = []
 	error_par = []
 	out = []
@@ -58,12 +61,12 @@ def main(argv  = None):
 			print("\nTokens List:\n")
 			for t in out:
 				if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
-					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
+					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t))
 				else:
-					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(lineas, t))
+					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t))
 	else:				# Lista de error del lexer no vacía, se imprimen solo los tokens de error encontrados
 		for t in error_lex:
-			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la Línea " + str(t.lineno) + ", Columna " + getcol(lineas, t) + ".")
+			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la línea " + str(t.lineno) + ", columna " + getcol(t) + ".")
 		exit(0)
 
 	sl_lexer.lexer.lineno = 1	# Reinicia el contador de lineas del lexer/parser
@@ -73,7 +76,7 @@ def main(argv  = None):
 	if sl_parser.get_errors(): error_par = sl_parser.get_errors()
 	if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
 		p = error_par[0]
-		print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + getcol(lineas, p) + ".")
+		print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + getcol(p) + ".")
 
 	if AST:
 		if "-a" in argv:
@@ -87,8 +90,10 @@ def main(argv  = None):
 			print("")
 
 		if "-s" in argv:
-			#sl_typecheck.init_st_stack()
 			sl_typecheck.build_symbol_table(AST)
+			#error_st = sl_typecheck.error_st
+			#if len(error_st) != 0:
+			#	pass
 			print("\nSymbol Table:\n")
 			print(sl_typecheck.tostring_symbol_table())
 
