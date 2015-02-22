@@ -14,20 +14,26 @@ from sl_lexer import tokens
 # Variable global error_par
 
 error_par = []
+var_lines = []
 
 # Definicion de la clase Node utilizada para la construccion del AST
 
 class Node:
-	def __init__(self, type, children=None, val=None):
+	def __init__(self, type, children=None, val=None, lineno=0):
 		self.type = type
 		if children: 
 			self.children = children
 		else:
 			self.children = []
 		self.val = val
+		self.lineno = lineno
 
 	def to_string(self, nivel=1):
+		global var_lines
 		s = str(self.val) + "\n"
+		if self.type == "vardec": var_lines = var_lines + [("VARDEC", self.val, "line: " + str(self.lineno))]
+		elif self.type == "for_stmt":
+			var_lines = var_lines + [("FOR", "int " + self.children[0].children[0].val, "line: " + str(self.children[0].lineno))]
 		if self.children:
 			for child in self.children:
 				s = s + "\t"*(nivel) + child.to_string(nivel+1)
@@ -117,7 +123,7 @@ def p_vardec(p):
 			  | type var_list SEMICOLON vardec'''
 	p[0] = []
 	for var in p[2]:
-		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var))]
+		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var), lineno=p.lineno(3))]
 	if len(p) == 5: p[0] = p[0] + p[4]
 
 def p_type(p):
@@ -312,7 +318,7 @@ def p_loop_while(p):
 def p_for_loop(p):
 	'''for_loop : FOR identifier direction expr DO instr
 				| FOR identifier direction expr DO block'''
-	p[0] = [Node("for_stmt", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable")] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
+	p[0] = [Node("for_stmt", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable", lineno=p.lineno(1))] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
 
 def p_direction(p):
 	'''direction : MIN

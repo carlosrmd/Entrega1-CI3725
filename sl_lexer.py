@@ -10,6 +10,7 @@
 
 import ply.lex as lex
 
+lexer = None
 error_lex = []
 
 # Declaración de tokens
@@ -184,6 +185,7 @@ def t_error(t):
 	t.lexer.skip(1)
 
 def build_lexer(contenido):
+	global lexer
 	lexer = lex.lex()
 	lexer.input(contenido)
 	return lexer
