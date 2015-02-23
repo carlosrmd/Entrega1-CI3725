@@ -110,8 +110,10 @@ def main(argv  = None):
 						value = st[1]
 						lineno = st[2]
 						lexpos = st[3]
-						if st[4]: inv_type1 = st[4]
-						if st[5]: inv_type2 = st[5]
+						if len(st) > 4:
+							inv_type1 = st[4]
+						if len(st) > 5:
+							inv_type2 = st[5]
 
  						if err_type == "redec":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable '" + str(value) + "' ya ha sido declarada en este alcance.")

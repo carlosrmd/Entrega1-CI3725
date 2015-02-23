@@ -39,7 +39,8 @@ def build_symbol_table_REC(AST):
 	val = ""
 	lin_dec = 0
 	col_dec = 0
-
+	#print(st_stack)
+	#print(len(st_stack.stack))
 	# Tipos AST de declaracion de variables, apertura y cierre de Scopes
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	if AST.type == "block": 
@@ -63,8 +64,15 @@ def build_symbol_table_REC(AST):
 		lin_dec = AST.lineno
 		col_dec = AST.colno
 
-		if not st_stack.top().insert(name, dec_scope, type, val, lin_dec):
+		actual_num_scopes = len(st_stack.stack)
+		aux = False
+		while(actual_num_scopes > 0):
+			if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
+				aux = True
+			actual_num_scopes = actual_num_scopes - 1
+		if aux:
 			error_st.append(("redec", name, lin_dec, col_dec))
+		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
 
 		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
 
@@ -90,9 +98,28 @@ def build_symbol_table_REC(AST):
 	elif AST.type == "block_end":
 		pop_stack_to_st()
 
+	elif AST.type == "assign":
+		var_string = getvars(AST)
+		var_aux = var_string.split("+")
+		var_list = []
+		for elem in var_aux:
+			var_list.append(elem.split(","))
+		nodec_vars = []
+		for var in var_list:
+			name = var[0]
+			lin_dec = int(var[1])
+			col_dec = int(var[2])
+			actual_num_scopes = len(st_stack.stack)
+			declared = False
+			while(actual_num_scopes > 0):
+				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
+					declared = True
+				actual_num_scopes = actual_num_scopes - 1
+			if not declared:
+				error_st.append(("nodec", name, lin_dec, col_dec))
+
 	# Tipos AST de asignacion de variables y evaluacion de expresiones
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
-
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -109,6 +136,20 @@ def build_symbol_table(AST):
 	if len(error_st) == 0: return strrep_st
 	else: return None
 
+def getvars(AST):
+	if AST.val == "variable":
+		return AST.children[0].val + "," + str(AST.children[0].lineno) + "," + str(AST.children[0].colno)
+	elif AST.val == "int" or AST.val == "constant" or AST.val == "set":
+		return ""
+	elif AST.val == "value":
+		return getvars(AST.children[0])
+	else:
+		uno = getvars(AST.children[0])
+		dos = getvars(AST.children[1])
+		if dos == "":
+			return uno
+		else:
+			return getvars(AST.children[0]) + "+" + getvars(AST.children[1])
 
 def pop_stack_to_st():
 	global strrep_st
