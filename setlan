@@ -110,8 +110,10 @@ def main(argv  = None):
 						value = st[1]
 						lineno = st[2]
 						lexpos = st[3]
-						if st[4]: inv_type1 = st[4]
-						if st[5]: inv_type2 = st[5]
+						if len(st) > 4:
+							inv_type1 = st[4]
+						if len(st) > 5:
+							inv_type2 = st[5]
 
  						if err_type == "redec":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable '" + str(value) + "' ya ha sido declarada en este alcance.")
@@ -121,6 +123,8 @@ def main(argv  = None):
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Instrucción '" + str(value) + "' espera expresiones de tipo 'bool', no de tipo '" + str(inv_type1) + "'.")
 						elif err_type == "inv_opr":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Operador '" + str(value) + "' no sirve con operandos de tipo '" + str(inv_type1) + "' y '" + str(inv_type2) + "'.")
+						elif err_type == "inv_assign":
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": No es posible asignar expresiones de tipo '" + str(inv_type2) + "' a variables de tipo '" + str(inv_type1) + "'.")
 						elif err_type == "read_ol":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable de iteración '" + str(value) + "' no puede ser modificada.")
 				else:
