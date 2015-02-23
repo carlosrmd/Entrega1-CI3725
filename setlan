@@ -87,7 +87,7 @@ def main(argv  = None):
 				print(AST)
 
 			if "-s" in argv:
-				sl_typecheck.build_symbol_table(AST)
+				SymTab = sl_typecheck.build_symbol_table(AST)
 				if sl_typecheck.get_errors(): error_st = sl_typecheck.get_errors()
 				if len(error_st) != 0:
 					for st in error_st:
@@ -95,19 +95,22 @@ def main(argv  = None):
 						value = st[1]
 						lineno = st[2]
 						lexpos = st[3]
-						if err_type == "redec":
+						if st[4]: inv_type1 = st[4]
+						if st[5]: inv_type2 = st[5]
+
+ 						if err_type == "redec":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable '" + str(value) + "' ya ha sido declarada en este alcance.")
 						elif err_type == "nodec":
-							pass
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable '" + str(value) + "' no ha sido declarada.")
 						elif err_type == "inv_tex":
-							pass
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Instrucción '" + str(value) + "' espera expresiones de tipo 'bool', no de tipo '" + str(inv_type1) + "'.")
 						elif err_type == "inv_opr":
-							pass
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Operador '" + str(value) + "' no sirve con operandos de tipo '" + str(inv_type1) + "' y '" + str(inv_type2) + "'.")
 						elif err_type == "read_ol":
-							pass
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable de iteración '" + str(value) + "' no puede ser modificada.")
 				else:
 					print("\nSymbol Table:\n")
-					print(sl_typecheck.tostring_symbol_table())
+					print(SymTab)
 
 	print("")
 

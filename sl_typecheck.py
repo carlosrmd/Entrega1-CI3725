@@ -26,7 +26,7 @@ st_stack = ST_Stack()
 symbol_table_final = SymTab()
 
 
-def build_symbol_table(AST):
+def build_symbol_table_REC(AST):
 	global st_stack
 	global strrep_st
 	global num_scopes
@@ -105,6 +105,12 @@ def build_symbol_table(AST):
 		pop_stack_to_st()
 
 
+def build_symbol_table(AST):
+	build_symbol_table_REC(AST)
+	if len(error_st) == 0: return strrep_st
+	else: return None
+
+
 def pop_stack_to_st():
 	global strrep_st
 	global indent_level
@@ -124,5 +130,4 @@ def get_errors():
 def tostring_symbol_table():
 	#return str(st_stack)
 	#return str(symbol_table_final.st)
-	if len(error_st) == 0: return strrep_st
-	else: return None
+	pass
