@@ -73,6 +73,7 @@ def build_symbol_table_REC(AST):
 		if aux:
 			error_st.append(("redec", name, lin_dec, col_dec))
 		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
+		print(st_stack.stack[0].typeof("n", 1))
 
 		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
 
@@ -99,18 +100,11 @@ def build_symbol_table_REC(AST):
 		pop_stack_to_st()
 
 	elif AST.type == "assign":
-		var_string = getvars(AST)
-		var_aux = var_string.split("+")
-		var_list = []
-
-		for elem in var_aux:
-			var_list.append(elem.split(","))
-		nodec_vars = []
-		
+		var_list = getvar_list(AST)
 		for var in var_list:
 			name = var[0]
-			lin_dec = int(var[1])
-			col_dec = int(var[2])
+			lin_dec = var[1]
+			col_dec = var[2]
 			actual_num_scopes = len(st_stack.stack)
 			declared = False
 			while(actual_num_scopes > 0):
@@ -138,13 +132,31 @@ def build_symbol_table(AST):
 	if len(error_st) == 0: return strrep_st
 	else: return None
 
+def getvar_list(AST):
+	var_string = getvars(AST)
+	var_aux = var_string.split("+")
+	var_list = []
+	for elem in var_aux:
+		toappend = elem.split(",")
+		if len(toappend) == 3:
+			toappend[1] = int(toappend[1])
+			toappend[2] = int(toappend[2])
+			var_list.append(toappend)
+	return var_list
+
 def getvars(AST):
 	if AST.val == "variable":
 		return AST.children[0].val + "," + str(AST.children[0].lineno) + "," + str(AST.children[0].colno)
-	elif AST.val == "int" or AST.val == "constant" or AST.val == "set":
+	elif AST.val == "int" or AST.val == "constant":
 		return ""
 	elif AST.val == "value":
 		return getvars(AST.children[0])
+	elif AST.val == "set":
+		toreturn = ""
+		for child in AST.children:
+			print("Si no te gusta como pienso mamame el guevo " + child.val)
+			toreturn = toreturn + "+" + getvars(child)
+		return toreturn
 	else:
 		uno = getvars(AST.children[0])
 		dos = getvars(AST.children[1])
