@@ -32,6 +32,11 @@ def main(argv  = None):
 		exit(1)
 	if argv[1][0] == "-":
 		print("ERROR: El primer argumento debe ser el nombre del archivo, no un flag.\n")
+		print("Uso: ./setlan [Nombre_Archivo] [-t|-a|-s]")
+		exit(1)
+	if argv[2] not in ["-t", "-a", "-s"]:
+		print("ERROR: No se reconoce el flag.")
+		print("Uso: ./setlan [Nombre_Archivo] [-t|-a|-s]\n")
 		exit(1)
 	if not os.path.exists(argv[1]): 
 		print("ERROR: El archivo especificado no existe.\n")
