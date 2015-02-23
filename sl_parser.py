@@ -119,7 +119,7 @@ def p_vardec(p):
 			  | type var_list SEMICOLON vardec'''
 	p[0] = []
 	for var in p[2]:
-		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var), lineno=p.lineno(3), colno=p.lexpos(3))]
+		p[0] = p[0] + [Node("vardec", None, str(p[1]) + " " + str(var.val), lineno=var.lineno, colno=var.colno)]
 	if len(p) == 5: p[0] = p[0] + p[4]
 
 def p_type(p):
@@ -131,16 +131,16 @@ def p_type(p):
 def p_var_list(p):
 	'''var_list : identifier
 				| var_list COMMA identifier'''
-	if len(p) == 2: p[0] = [p[1]]
-	else: p[0] = p[1] + [p[3]]
+	if len(p) == 2: p[0] = p[1]
+	else: p[0] = p[1] + p[3]
 
 def p_assign(p):
 	'''assign : identifier ASSIGN expr'''
-	p[0] = [Node("assign", [Node("var_stmt", [Node("variable", None, str(p[1]))], "variable"), Node("value", p[3], "value")], "ASSIGN")]
+	p[0] = [Node("assign", [Node("var_stmt", p[1], "variable"), Node("value", p[3], "value")], "ASSIGN")]
 
 def p_scan(p):
 	'''scan : SCAN identifier'''
-	p[0] = [Node("scan", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable")], "SCAN")]
+	p[0] = [Node("scan", [Node("var_stmt", p[2], "variable")], "SCAN")]
 
 ### INSTRUCCIONES PRINT
 
@@ -164,28 +164,28 @@ def p_elements(p):
 
 def p_integer(p):
 	'''integer : INTEGER'''
-	p[0] = p[1]
+	p[0] = [Node("int", None, str(p[1]))]
 
 def p_term_int(p):
 	'''term : integer'''
-	p[0] = [Node("int_stmt", [Node("int", None, str(p[1]))], "int")]
+	p[0] = [Node("int_stmt", p[1], "int")]
 
 def p_bool_const(p):
 	'''bool : TRUE
 			| FALSE'''
-	p[0] = p[1]
+	p[0] = [Node("const", None, str(p[1]))]
 
 def p_term_bool_const(p):
 	'''term : bool'''
-	p[0] = [Node("const_stmt", [Node("const", None, str(p[1]))], "constant")]
+	p[0] = [Node("const_stmt", p[1], "constant")]
 
 def p_identifier(p):
 	'''identifier : IDENTIFIER'''
-	p[0] = p[1]
+	p[0] = [Node("variable", None, str(p[1]), lineno=p.lineno(1), colno=p.lexpos(1))]
 
 def p_term_id(p):
 	'''term : identifier'''
-	p[0] = [Node("var_stmt", [Node("variable", None, str(p[1]))], "variable")]
+	p[0] = [Node("var_stmt", p[1], "variable")]
 
 def p_set(p):
 	'''set : LCURLY setelem RCURLY'''
@@ -314,7 +314,7 @@ def p_loop_while(p):
 def p_for_loop(p):
 	'''for_loop : FOR identifier direction expr DO instr
 				| FOR identifier direction expr DO block'''
-	p[0] = [Node("for_stmt", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable", lineno=p.lineno(1), colno=p.lexpos(1))] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
+	p[0] = [Node("for_stmt", [Node("var_stmt", p[2], "variable")] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
 
 def p_direction(p):
 	'''direction : MIN

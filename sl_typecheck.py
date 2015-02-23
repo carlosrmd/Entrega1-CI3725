@@ -101,6 +101,9 @@ def build_symbol_table_REC(AST):
 	elif AST.type == "block_end":
 		pop_stack_to_st()
 
+
+	# Tipos AST de asignacion de variables y evaluacion de expresiones
+	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	elif AST.type == "assign":
 		var_list = getvar_list(AST)
 		for var in var_list:
@@ -126,10 +129,6 @@ def build_symbol_table_REC(AST):
 			assign_value_type = gettype(AST.children[1].children[0])
 			if assign_value_type != "error" and assign_value_type != to_assign_type:
 				error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
-
-
-	# Tipos AST de asignacion de variables y evaluacion de expresiones
-	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -195,10 +194,6 @@ def gettype(AST):
 			if a != "error": error_st.append(("inv_neg", "-" , AST.lineno, AST.colno, a))
 			return "error"
 
-
-
-
-
 def getvar_list(AST):
 	var_string = getvars(AST)
 	var_aux = var_string.split("+")
@@ -250,6 +245,7 @@ def get_errors():
 	return error_st
 
 
+# PRUEBAS - QUITAR!
 def tostring_symbol_table():
 	#return str(st_stack)
 	#return str(symbol_table_final.st)

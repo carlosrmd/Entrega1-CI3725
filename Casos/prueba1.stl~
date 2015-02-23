@@ -1,0 +1,32 @@
+program {
+	# USING
+	using
+		int a;
+		int b, c;
+		set x, y;
+		bool z, w;
+	in
+	
+	# SCAN
+	scan a;
+
+	# PRINT
+	print "Hola. ";
+
+	# PRINTLN
+	println "Chao.";
+	scan b;
+	# PRINT WITH ERROR
+	#print "Pedro."
+
+	# ARITHMETIC EXPRESSION
+	a = 5 + 2;
+	b = 4 + a;
+	c = a + b * 3;
+	x = {1, 2, a, (b + c * a)};
+	f = e or a + b @ c ++ d; # SENSELESS EXPRESSION BUT SEMANTICALLY CORRECT
+
+	# PRINT
+	print "RES: ", c, (a), 3 / 5 * w, (w + x * z - 9 / h % 7), "\n", -(a + 4);
+	println c ++ d, ", ", c >< d, ", ", c \ d, ", ", >? c, ", ", <? c, ", ", $? c, 5 <+> b;
+}

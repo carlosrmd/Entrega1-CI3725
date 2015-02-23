@@ -1,0 +1,32 @@
+program {
+	using
+		int a, b, c;
+		bool d;
+	in
+
+	#scan a;
+	
+	#a = a and b;
+	#d = a or b and c;
+
+	#print h;	
+	
+	if (n < 0)
+        	println "no negative fibonaccis", a
+	;
+	
+  repeat {
+	using
+		bool a, b;
+	in
+    f = e or a;
+}
+  while (not f) do
+    e = a < b
+  ;
+
+    #for i min d ++ c do
+    #  c = c + i * 2
+#;
+	#scan b;
+}

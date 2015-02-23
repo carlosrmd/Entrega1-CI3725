@@ -1,0 +1,39 @@
+program {
+	using
+		bool a;
+	in
+
+	if (n < 0)
+		for i min d ++ c do
+			print "Hello." #c = c + i * 2		
+		#println "no negative fibonaccis"
+	else 	if (n > 0)
+			println "fib(0) = 1"
+		else 	{
+			using
+				int low, high, count, tmp;
+				set kop, bniuisop;
+			in
+			
+			scan low;
+			for i min h ++ t do {
+				using
+					int kulo, nalga;
+					set pypy;
+					bool theta;
+				in				
+				print "CHAO";
+			};
+		};
+
+	scan a;
+	
+	for i max a <+> y ++ b <+> x ++ y ++ x do
+		print i, ", "
+	;
+	
+	repeat
+		print "Hello."
+	while (5 > 4) do
+		print "Hello."; #e = a < b or f;
+}
