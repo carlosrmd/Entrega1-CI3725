@@ -126,6 +126,7 @@ def get_errors():
 	return error_st
 
 
+# PRUEBAS - QUITAR!
 def tostring_symbol_table():
 	#return str(st_stack)
 	#return str(symbol_table_final.st)
