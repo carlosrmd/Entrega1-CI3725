@@ -44,12 +44,11 @@ def build_symbol_table_REC(AST):
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	if AST.type == "block": 
 		num_scopes += 1
-		strrep_st = strrep_st + "\t"*indent_level + "SCOPE" + "\n"
-		indent_level += 1
-
-	elif AST.type == "using":
 		st = SymTab()
 		st_stack.push(st)
+
+		strrep_st = strrep_st + "\t"*indent_level + "SCOPE" + "\n"
+		indent_level += 1
 
 	elif AST.type == "vardec":
 		vardec = str(AST.val)

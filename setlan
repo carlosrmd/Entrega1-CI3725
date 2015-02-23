@@ -10,6 +10,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sl_lexer, sl_parser, sl_typecheck
+import os.path
 
 # Main del programa
 
@@ -21,13 +22,22 @@ def getcol(lineno, lexpos):
 
 def main(argv  = None):
 	import sys
-	if(argv is None):
+
+	if argv is None :
 		argv = sys.argv
-	if(len(argv) == 1):
-		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo] [-t|-a|-s]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.\n")
+	if len(argv) != 3 :
+		print("ERROR: Número incorrecto de argumentos.")
+		print("Uso: ./setlan [Nombre_Archivo] [-t|-a|-s]")
+		print("Por favor verifíque que el archivo existe en su directorio y está correctamente escrito.\n")
 		exit(1)
 	if argv[1][0] == "-":
 		print("ERROR: El primer argumento debe ser el nombre del archivo, no un flag.\n")
+		exit(1)
+	if not os.path.exists(argv[1]): 
+		print("ERROR: El archivo especificado no existe.\n")
+		exit(1)
+	if str(argv[1])[-4:] != ".stl": 
+		print("ERROR: El archivo especificado no posee el formato '.stl'.\n")
 		exit(1)
 
 	global error_lex
