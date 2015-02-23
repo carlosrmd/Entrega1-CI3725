@@ -1,0 +1,16 @@
+program {
+	using
+		int a, b;
+		set c, d;
+		bool e, f;
+	in
+
+	println a + b, ", ", a - b, ", ", a * b, ", ", a / b, ", ", a % b, ", ", -a;
+	println c ++ d, ", ", c >< d, ", ", c \ d, ", ", >? c, ", ", <? c, ", ", $? c;
+	println a <+> c, ", ", c <-> a, ", ", a <*> c, ", ", c </> a, ", ", c <%> a, ", ", a @ c;
+	#println not e;#e or f;#, ", ", e and f, ", ", not e;
+	println a < b, a <= b, a > b, a >= b;
+	println a == b, a /= b;
+	println c == d, c /= d;
+	print e == f, e /= f, ({3, 4} == a);
+}

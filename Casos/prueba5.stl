@@ -1,0 +1,18 @@
+program {
+	using
+		int a, b, c;
+		set x, y;
+		bool p, q, r, s;
+	in
+	
+	if (a == 4) {
+		using
+			set h, y;
+			bool a, p;
+			int c, q;
+		in
+		
+		scan a;
+	};	
+	
+}
