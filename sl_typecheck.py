@@ -102,9 +102,11 @@ def build_symbol_table_REC(AST):
 		var_string = getvars(AST)
 		var_aux = var_string.split("+")
 		var_list = []
+
 		for elem in var_aux:
 			var_list.append(elem.split(","))
 		nodec_vars = []
+		
 		for var in var_list:
 			name = var[0]
 			lin_dec = int(var[1])
