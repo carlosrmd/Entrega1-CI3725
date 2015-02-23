@@ -12,6 +12,7 @@ import ply.lex as lex
 
 lexer = None
 error_lex = []
+lineas = []
 
 # Declaración de tokens
 

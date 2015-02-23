@@ -8,6 +8,8 @@
 #			 Christian Teixeira - 11-11016    #
 # # # # # # # # # # # # # # # # # # # # # # # #
 
+# Clase definicion de Symbol Table
+
 class SymTab:
 	
 	# Se implementa la Tabla de Simbolos utilizando para ello
@@ -22,27 +24,28 @@ class SymTab:
 	# val: valor inicial de la variable (0, false, {})
 	# dec_scope: nro. de scope donde se declara la variable
 	# lin_dec: linea del programa en que se declaro la variable.
+	# read_only: con 1 especifica que la variable es de solo lectura (de un FOR)		 
 
 	def __init__(self):
 		self.st = {}
 
-	def insert(self, name, dec_scope, type, val, lin_dec):
+	def insert(self, name, dec_scope, type, val, lin_dec, read_only=0):
 		if not self.contains(name, dec_scope):
-			self.st[(name, dec_scope)] = (type, val, lin_dec)
+			self.st[(name, dec_scope)] = (type, val, lin_dec, read_only)
 			return True
 		else:
 			return False
 
-	def delete(self, name, dec_scope, type, val, lin_dec):
-		if self.contains(name, dec_scope) and self.st[(name, dec_scope)] == (type, val, lin_dec):
+	def delete(self, name, dec_scope, type, val, lin_dec, read_only=0):
+		if self.contains(name, dec_scope) and self.st[(name, dec_scope)] == (type, val, lin_dec, read_only):
 			del self.st[(name, dec_scope)]
 			return True
 		else:
 			return False
 
-	def update(self, name, dec_scope, type, val, lin_dec):
+	def update(self, name, dec_scope, type, val, lin_dec, read_only=0):
 		if self.contains(name, dec_scope):
-			self.st[(name, dec_scope)] = (type, val, lin_dec)
+			self.st[(name, dec_scope)] = (type, val, lin_dec, read_only)
 			return True
 		else:
 			return False
@@ -74,6 +77,9 @@ class SymTab:
 		else:
 			return False
 
+	def isreadonly(self, name, dec_scope):
+		return self.read_only == 1
+
 	def var_list(self):
 		return self.st.keys()
 
@@ -90,9 +96,9 @@ class SymTab:
 
 
 
-class ST_Stack:
+# Clase definicion de Pila de Symbol Tables
 
-	# Clase definicion de Pila de Symbol Tables
+class ST_Stack:
 
 	def __init__(self):
 		self.stack = []

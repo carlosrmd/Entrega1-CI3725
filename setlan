@@ -11,25 +11,23 @@
 
 import sl_lexer, sl_parser, sl_typecheck
 
-lineas = []
+# Main del programa
 
-# main del programa
-
-def getcol(token):
+def getcol(lineno, lexpos):
 	aux = 0
-	for i in range(token.lineno-1):
+	for i in range(lineno - 1):
 		aux = aux + len(lineas[i])
-	return str(token.lexpos - aux + 1)
+	return str(lexpos - aux + 1)
 
 def main(argv  = None):
 	import sys
 	if(argv is None):
 		argv = sys.argv
 	if(len(argv) == 1):
-		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo] [-t -a -s]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.")
+		print("ERROR: No se encontró argumento.\nUso: ./setlan [Nombre_Archivo] [-t|-a|-s]\nPor favor verifíque que el archivo existe en su directorio y está correctamente escrito.\n")
 		exit(1)
 	if argv[1][0] == "-":
-		print("ERROR: Primer argumento debe ser el nombre del archivo, no un flag.")
+		print("ERROR: El primer argumento debe ser el nombre del archivo, no un flag.\n")
 		exit(1)
 
 	global error_lex
@@ -37,6 +35,7 @@ def main(argv  = None):
 	global lineas
 	error_lex = []
 	error_par = []
+	error_st = []
 	out = []
 
 	nombreArchivo = argv[1]
@@ -47,6 +46,7 @@ def main(argv  = None):
 
 	lexer = sl_lexer.build_lexer(contenido)
 	error_lex = sl_lexer.get_errors()
+	sl_lexer.lineas = lineas
 
 	# Loop para extraer tokens correctos
 
@@ -56,47 +56,60 @@ def main(argv  = None):
 		out.append(tok)		# Se incluyen en la lista de out
 
 	# Imprimir resultados
+
 	if len(error_lex) == 0:	# Lista de error vacía, se imprimen los tokens correctos
 		if "-t" in argv:
 			print("\nTokens List:\n")
 			for t in out:
 				if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
-					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t))
+					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
 				else:
-					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t))
+					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
 	else:				# Lista de error del lexer no vacía, se imprimen solo los tokens de error encontrados
 		for t in error_lex:
-			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la línea " + str(t.lineno) + ", columna " + getcol(t) + ".")
+			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la línea " + str(t.lineno) + ", columna " + getcol(t.lineno, t.lexpos) + ".")
 		exit(0)
 
-	sl_lexer.lexer.lineno = 1	# Reinicia el contador de lineas del lexer/parser
-	
-	parser = sl_parser.build_parser()
-	AST = parser.parse(contenido)
-	if sl_parser.get_errors(): error_par = sl_parser.get_errors()
-	if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
-		p = error_par[0]
-		print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + getcol(p) + ".")
 
-	if AST:
-		if "-a" in argv:
-			print("\nAST:\n")
-			print(AST)
+	if "-a" in argv or "-s" in argv:
+		sl_lexer.lexer.lineno = 1	# Reinicia el contador de lineas del lexer/parser
+		
+		parser = sl_parser.build_parser()
+		AST = parser.parse(contenido)
+		if sl_parser.get_errors(): error_par = sl_parser.get_errors()
+		if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
+			p = error_par[0]
+			print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + getcol(p.lineno, p.lexpos) + ".")
+		
+		if AST:
+			if "-a" in argv:
+				print("\nAST:\n")
+				print(AST)
 
-			# IMPRIME TODAS LAS DECLARACIONES DE VARIABLES ENCONTRADAS - QUITAR DESPUES!!
-			print("\nVARIABLES:\n\n")
-			for i in (sl_parser.var_lines):
-				print(str(i))
-			print("")
+			if "-s" in argv:
+				sl_typecheck.build_symbol_table(AST)
+				if sl_typecheck.get_errors(): error_st = sl_typecheck.get_errors()
+				if len(error_st) != 0:
+					for st in error_st:
+						err_type = st[0]
+						value = st[1]
+						lineno = st[2]
+						lexpos = st[3]
+						if err_type == "redec":
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable '" + str(value) + "' ya ha sido declarada en este alcance.")
+						elif err_type == "nodec":
+							pass
+						elif err_type == "inv_tex":
+							pass
+						elif err_type == "inv_opr":
+							pass
+						elif err_type == "read_ol":
+							pass
+				else:
+					print("\nSymbol Table:\n")
+					print(sl_typecheck.tostring_symbol_table())
 
-		if "-s" in argv:
-			sl_typecheck.build_symbol_table(AST)
-			#error_st = sl_typecheck.error_st
-			#if len(error_st) != 0:
-			#	pass
-			print("\nSymbol Table:\n")
-			print(sl_typecheck.tostring_symbol_table())
-
+	print("")
 
 if __name__ == "__main__":
 	main()

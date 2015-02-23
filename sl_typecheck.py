@@ -10,9 +10,7 @@
 
 from sl_symtab import SymTab, ST_Stack
 
-lineas = []
-
-# Tipos de Errores detectados en esta etapa:
+# Tipos de errores detectados en esta etapa:
 
 # "redec": Redeclaracion de variable en el mismo alcance
 # "nodec": Uso de variable no declarada
@@ -118,32 +116,13 @@ def pop_stack_to_st():
 	strrep_st = strrep_st + "\t"*indent_level + "END_SCOPE" + "\n"
 
 
-def getcol(numlineas, numcolumna):
-	aux = 0
-	for i in range(numlineas - 1):
-		aux = aux + len(lineas[i])
-	return str(numcolumna - aux + 1)
-
-
-def report_st_errors():
-	s = ""
-	for i in error_st:
-		if i[0] == "redec":
-			s = s + "Error en la linea " + str(i[2]) + ", columna " + getcol(i[2], i[3]) + ": La variable '" + str(i[1]) + "' ya ha sido declarada en este alcance."
-		elif i[0] == "nodec":
-			pass
-		elif i[0] == "inv_tex":
-			pass
-		elif i[0] == "inv_opr":
-			pass
-		elif i[0] == "read_ol":
-			pass
-		s = s + "\n"
-	return s
+def get_errors():
+	global error_st
+	return error_st
 
 
 def tostring_symbol_table():
 	#return str(st_stack)
 	#return str(symbol_table_final.st)
 	if len(error_st) == 0: return strrep_st
-	else: return report_st_errors()
+	else: return None

@@ -314,7 +314,7 @@ def p_loop_while(p):
 def p_for_loop(p):
 	'''for_loop : FOR identifier direction expr DO instr
 				| FOR identifier direction expr DO block'''
-	p[0] = [Node("for_stmt", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable", lineno=p.lineno(1))] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
+	p[0] = [Node("for_stmt", [Node("var_stmt", [Node("variable", None, str(p[2]))], "variable", lineno=p.lineno(1), colno=p.lexpos(1))] + p[3] + [Node("in", None, "IN")] + p[4] + [Node("do_stmt", p[6], "DO")], "FOR")]
 
 def p_direction(p):
 	'''direction : MIN
@@ -328,6 +328,7 @@ def p_error(p):
 	error_par.append(p)
 
 def get_errors():
+	global error_par
 	return error_par
 
 ### CONSTRUCCION DEL PARSER
