@@ -17,6 +17,7 @@ from sl_symtab import SymTab, ST_Stack
 # "inv_tex": Tipo de expresion invalido
 # "inv_opr": Operacion o tipo de operandos invalidos
 # "inv_assign" Asignación inválida
+# "inv_neg" Negación inválida
 # "read_ol": Asignacion a una variable read_only (de un FOR)
 
 error_st = []
@@ -108,21 +109,23 @@ def build_symbol_table_REC(AST):
 			col_dec = var[2]
 			actual_num_scopes = len(st_stack.stack)
 			declared = False
+			no_errors = True
 			while(actual_num_scopes > 0):
 				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
 					declared = True
 				actual_num_scopes = actual_num_scopes - 1
 			if not declared:
+				no_errors = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
-
-		varname = AST.children[0].children[0].val
-		for i in range(num_scopes):
-			if st_stack.stack[0].typeof(varname, i+1):
-				to_assign_type = st_stack.stack[0].typeof(varname, i+1)
-		print("Buey Almizclero " + to_assign_type)
-		assign_value_type = gettype(AST.children[1].children[0])
-		if assign_value_type != "error" and assign_value_type != to_assign_type:
-			error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
+		if no_errors:
+			varname = AST.children[0].children[0].val
+			for i in range(num_scopes):
+				if st_stack.stack[0].typeof(varname, i+1):
+					to_assign_type = st_stack.stack[0].typeof(varname, i+1)
+			print("Buey Almizclero " + to_assign_type)
+			assign_value_type = gettype(AST.children[1].children[0])
+			if assign_value_type != "error" and assign_value_type != to_assign_type:
+				error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
 
 
 	# Tipos AST de asignacion de variables y evaluacion de expresiones
@@ -186,10 +189,15 @@ def gettype(AST):
 			return "error"
 
 	if AST.type == "negate_stmt":
-		if gettype(AST.children[0]) == "int":
-			return "int"
+		a = gettype(AST.children[0])
+		if a == "int": return "int"
 		else:
-			
+			if a != "error": error_st.append(("inv_neg", "-" , AST.lineno, AST.colno, a))
+			return "error"
+
+
+
+
 
 def getvar_list(AST):
 	var_string = getvars(AST)
