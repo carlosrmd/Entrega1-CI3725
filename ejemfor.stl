@@ -1,0 +1,19 @@
+program {
+    using
+        set s;
+        int n;
+    in
+    s = {2, 3, 1};
+    for i min s do {
+    	if (i > 3){
+    		using
+    			int pipe;
+    		in
+    		pipe = pipe + 1;
+    	};
+        println i;
+        s = s ++ {i * 2}; # unión de conjuntos
+    };
+
+    print s;
+}

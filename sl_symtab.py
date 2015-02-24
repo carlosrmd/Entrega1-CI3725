@@ -78,7 +78,7 @@ class SymTab:
 			return False
 
 	def isreadonly(self, name, dec_scope):
-		return self.read_only == 1
+		return self.st[(name, dec_scope)][3] == 1
 
 	def var_list(self):
 		return self.st.keys()

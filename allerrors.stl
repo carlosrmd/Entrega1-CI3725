@@ -1,0 +1,40 @@
+# Programa para 
+program {
+    using
+        int n, m;
+        bool po;
+        set pepe;
+    in
+    scan n;
+  if (true){
+    using
+        int n, k;
+    in
+    n = pedro;
+  }
+  else if (4) {
+    using
+        int te, tete, tetete;
+        bool po, popo, popopo;
+        set ja, jaja, jajaja;
+    in
+    print "improbable";
+    n = po + po;
+    n = po;
+    n = -po;
+    n = not m;
+    n = >? po;
+  };
+      for i min s do {
+        if (i > 3){
+            using
+                int pipe;
+            in
+            pipe = pipe + 1;
+        };
+        println i;
+        pepe = pepe ++ {i * 2}; # unión de conjuntos
+        i = 2;
+    };
+
+}
