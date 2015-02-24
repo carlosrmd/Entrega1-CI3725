@@ -106,13 +106,13 @@ def build_symbol_table_REC(AST):
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	elif AST.type == "assign":
 		var_list = getvar_list(AST)
+		no_errors = True
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
 			actual_num_scopes = len(st_stack.stack)
 			declared = False
-			no_errors = True
 			while(actual_num_scopes > 0):
 				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
 					declared = True
@@ -120,15 +120,23 @@ def build_symbol_table_REC(AST):
 			if not declared:
 				no_errors = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
+		print("Here I am with " + name + " and noerrors is " + str(no_errors))
 		if no_errors:
 			varname = AST.children[0].children[0].val
 			for i in range(num_scopes):
 				if st_stack.stack[0].typeof(varname, i+1):
 					to_assign_type = st_stack.stack[0].typeof(varname, i+1)
-			print("Buey Almizclero " + to_assign_type)
 			assign_value_type = gettype(AST.children[1].children[0])
 			if assign_value_type != "error" and assign_value_type != to_assign_type:
 				error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
+
+	elif AST.type == "scan":
+		encontrado = False
+		for i in range(num_scopes):
+			if st_stack.stack[0].contains(AST.children[0].children[0].val, i+1):
+				encontrado = True
+		if not encontrado:
+			error_st.append(("nodec", AST.children[0].children[0].val, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -148,7 +156,6 @@ def build_symbol_table(AST):
 def gettype(AST):
 
 	if AST.val == "int" or AST.val == "set":
-		print("Zarramagurdi " + AST.type)
 		return AST.val
 	if AST.val == "true" or AST.val == "false":
 		return "bool"
@@ -194,6 +201,15 @@ def gettype(AST):
 			if a != "error": error_st.append(("inv_neg", "-" , AST.lineno, AST.colno, a))
 			return "error"
 
+	if AST.type == "bool_binopr":
+		a = gettype(AST.children[0])
+		b = gettype(AST.children[1])
+		if a == "bool" and b == "bool":
+			return "bool"
+		else:
+			opr = AST.val.split(" ")
+			if a != "error" and b != "error": error_st.append(("inv_opr", opr[1] , AST.lineno, AST.colno, a, b))
+			return "error"
 def getvar_list(AST):
 	var_string = getvars(AST)
 	var_aux = var_string.split("+")
@@ -219,7 +235,6 @@ def getvars(AST):
 			toreturn = toreturn + "+" + getvars(child)
 		return toreturn
 	else:
-		print(AST.val)
 		uno = getvars(AST.children[0])
 		if len(AST.children) == 1:
 			return uno
