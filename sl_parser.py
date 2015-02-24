@@ -298,6 +298,9 @@ def p_condition(p):
 	else:
 		p[0] = [Node("if_stmt", [Node("cond_stmt", p[3], "condition"), Node("then_stmt", p[5], "THEN"), Node("else_stmt", p[7], "ELSE")], "IF")]
 
+	p[0][0].lineno = p.lineno(1)
+	p[0][0].colno = p.lexpos(1)
+
 ### BLOQUES DE LOOP
 
 def p_loop_repeat(p):
@@ -312,10 +315,13 @@ def p_loop_repeat(p):
 	else:
 		p[0] = [Node("repeat_stmt", p[2], "REPEAT"), Node("while_stmt", [Node("cond_stmt", p[5], "condition")], "WHILE")]
 
+	p[0][1].lineno = p.lineno(3)
+	p[0][1].colno = p.lexpos(3)
+
 def p_loop_while(p):
 	'''loop : WHILE LPAREN expr RPAREN DO instr
 			| WHILE LPAREN expr RPAREN DO block'''
-	p[0] = [Node("while_stmt", [Node("cond_stmt", p[3], "condition")], "WHILE"), Node("do_stmt", p[6], "DO")]
+	p[0] = [Node("while_stmt", [Node("cond_stmt", p[3], "condition")], "WHILE", lineno=p.lineno(1), colno=p.lexpos(1)), Node("do_stmt", p[6], "DO")]
 
 def p_for_loop(p):
 	'''for_loop : FOR identifier direction expr DO instr
