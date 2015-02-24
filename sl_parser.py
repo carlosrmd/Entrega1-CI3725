@@ -266,6 +266,9 @@ def p_expr_binopr(p):
 
 	elif p[2] == '@': p[0] = [Node("expr_setcont", p[1] + p[3], "CONTAINS @")]
 
+	p[0][0].lineno = p.lineno(2)
+	p[0][0].colno = p.lexpos(2)
+
 def p_expr_unropr(p):
 	'''expr : NOT expr
 			| SETMAX expr
@@ -277,6 +280,9 @@ def p_expr_unropr(p):
 	elif p[1] == "<?": p[0] = [Node("set_unropr", p[2], "MIN <?")]
 	elif p[1] == "$?": p[0] = [Node("set_unropr", p[2], "SIZE $?")]
 	elif p[1] == '-': p[0] = [Node("negate_stmt", p[2], "NEGATE -")]
+
+	p[0][0].lineno = p.lineno(1)
+	p[0][0].colno = p.lexpos(1)
 
 ### BLOQUES CONDICIONALES
 
