@@ -115,6 +115,7 @@ def build_symbol_table_REC(AST):
 			declared = False
 			while(actual_num_scopes > 0):
 				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
+					print(name+ " found.")
 					declared = True
 				actual_num_scopes = actual_num_scopes - 1
 			if not declared:
@@ -122,9 +123,11 @@ def build_symbol_table_REC(AST):
 				error_st.append(("nodec", name, lin_dec, col_dec))
 		if no_errors:
 			varname = AST.children[0].children[0].val
-			for i in range(num_scopes):
-				if st_stack.stack[0].typeof(varname, i+1):
-					to_assign_type = st_stack.stack[0].typeof(varname, i+1)
+			print("Now Im with " + varname + " with stack " + str(st_stack) + " and " + str(num_scopes) + " scopes")
+			for i in range(len(st_stack.stack)):
+				if st_stack.stack[i].contains(varname, i+1):
+					to_assign_type = st_stack.stack[i].typeof(varname, i+1)
+					print("A la variable " + varname + " le asigno el tipo " + str(to_assign_type))
 			assign_value_type = gettype(AST.children[1].children[0])
 			if assign_value_type != "error" and assign_value_type != to_assign_type:
 				error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
@@ -198,9 +201,9 @@ def gettype(AST):
 		return "bool"
 	if AST.type == "var_stmt":
 		print("Now val is " + AST.children[0].val)
-		for i in range(num_scopes):
-			if st_stack.stack[0].typeof(AST.children[0].val, i+1):
-				to_assign_type = st_stack.stack[0].typeof(AST.children[0].val, i+1)
+		for i in range(len(st_stack.stack)):
+			if st_stack.stack[i].typeof(AST.children[0].val, i+1):
+				to_assign_type = st_stack.stack[i].typeof(AST.children[0].val, i+1)
 		return to_assign_type
 
 	# Operadores
