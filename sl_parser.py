@@ -106,6 +106,7 @@ def p_instr(p):
 
 def p_instr_block(p):
 	'''instr_block : instr SEMICOLON instr_block
+				   | block SEMICOLON instr_block
 			 	   | empty'''
 	p[0] = p[1]
 	if len(p) == 4 and p[3]: p[0] = p[0] + p[3]
