@@ -81,12 +81,13 @@ def build_symbol_table_REC(AST):
 		indent_level += 1
 
 		name = str(AST.children[0].children[0].val)
+		if vardeclared(name):
+			error_st.append(("redec", name, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 		dec_scope = num_scopes
 		type = "int"
 		val = "0"
 		lin_dec = AST.lineno
 		read_only = 1
-
 		st_stack.top().insert(name, dec_scope, type, val, lin_dec, read_only)
 
 		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
@@ -100,22 +101,25 @@ def build_symbol_table_REC(AST):
 	elif AST.type == "assign":
 		var_list = getvar_list(AST)
 		assign_value_type = str(gettype(AST.children[1].children[0]))
+		varname = AST.children[0].children[0].val
 		no_errors = True
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
 			if not vardeclared(name):
+				no_errors = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
-		varname = AST.children[0].children[0].val
-		for i in range(len(st_stack.stack)):
-			for k in range(num_scopes):
-				if st_stack.stack[i].contains(varname, k+1):
-					to_assign_type = st_stack.stack[i].typeof(varname, k+1)
-					if st_stack.stack[i].isreadonly(varname, k+1):
-						error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
-		if (assign_value_type == "int" or assign_value_type == "bool" or assign_value_type == "set")  and assign_value_type != to_assign_type:
-			error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
+		if no_errors:
+			for i in range(len(st_stack.stack)):
+				for k in range(num_scopes):
+					if st_stack.stack[i].contains(varname, k+1):
+						to_assign_type = st_stack.stack[i].typeof(varname, k+1)
+						if st_stack.stack[i].isreadonly(varname, k+1):
+							error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
+
+			if (assign_value_type == "int" or assign_value_type == "bool" or assign_value_type == "set")  and assign_value_type != to_assign_type:
+				error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
 
 	elif AST.type == "scan":
 		name = AST.children[0].children[0].val
@@ -168,6 +172,13 @@ def build_symbol_table_REC(AST):
 		fortype = gettype(AST.children[3])
 		if fortype != "set":
 			error_st.append(("inv_tex", AST.val, AST.children[3].lineno, AST.children[3].colno, "set", fortype))
+		var_list = getvar_list(AST)
+		for var in var_list:
+			name = var[0]
+			lin_dec = var[1]
+			col_dec = var[2]
+			if not vardeclared(name):
+				error_st.append(("nodec", name, lin_dec, col_dec))
 		pop_stack_to_st()
 
 
