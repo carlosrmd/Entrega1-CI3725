@@ -106,8 +106,6 @@ def build_symbol_table_REC(AST):
 	elif AST.type == "assign":
 		var_list = getvar_list(AST)
 		no_errors = True
-		print(st_stack)
-		print(num_scopes)
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
@@ -131,7 +129,7 @@ def build_symbol_table_REC(AST):
 							error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 			assign_value_type = gettype(AST.children[1].children[0])
 			if assign_value_type != "error" and assign_value_type != to_assign_type:
-				error_st.append(("inv_assign", "=" , AST.lineno, AST.colno, to_assign_type, assign_value_type))
+				error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
 
 	elif AST.type == "scan":
 		encontrado = False
@@ -158,8 +156,11 @@ def build_symbol_table_REC(AST):
 
 	elif AST.type == "if_stmt" or AST.type == "while_stmt":
 		var_list = getvar_list(AST.children[0])
+		aux = []
 		no_errors = True
+		lin_dec, col_dec, lineno, colno = 0, 0, 0, 0
 		for var in var_list:
+			aux.append(var)
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
@@ -175,7 +176,10 @@ def build_symbol_table_REC(AST):
 		if no_errors:
 			act_type = gettype(AST.children[0].children[0])
 			if act_type != "bool" and act_type != "error":
-				error_st.append(("inv_tex", AST.val, lin_dec, col_dec, act_type))
+				if len(aux) > 0:
+					lineno = aux[0][1]
+					colno = aux[0][2]
+				error_st.append(("inv_tex", AST.val, lineno, colno, act_type))
 
 
 	# Recorre los hijos del nodo actual

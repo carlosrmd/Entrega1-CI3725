@@ -12,7 +12,7 @@ program {
     in
     n = pedro;
   }
-  else if (4) {
+  else if (n+m) {
     using
         int te, tete, tetete;
         bool po, popo, popopo;
