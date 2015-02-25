@@ -66,13 +66,7 @@ def build_symbol_table_REC(AST):
 		lin_dec = AST.lineno
 		col_dec = AST.colno
 
-		actual_num_scopes = len(st_stack.stack)
-		aux = False
-		while(actual_num_scopes > 0):
-			if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
-				aux = True
-			actual_num_scopes = actual_num_scopes - 1
-		if aux:
+		if vardeclared(name):
 			error_st.append(("redec", name, lin_dec, col_dec))
 		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
 
@@ -105,57 +99,46 @@ def build_symbol_table_REC(AST):
 	# Realiza la funcion correspondiente al tipo de nodo (AST.type)
 	elif AST.type == "assign":
 		var_list = getvar_list(AST)
+		assign_value_type = str(gettype(AST.children[1].children[0]))
 		no_errors = True
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
-			actual_num_scopes = len(st_stack.stack)
-			declared = False
-			for i in range(len(st_stack.stack)):
-				for k in range(num_scopes):
-					if st_stack.stack[i].contains(name, k+1):
-						declared = True
-			if not declared:
-				no_errors = False
+			if not vardeclared(name):
 				error_st.append(("nodec", name, lin_dec, col_dec))
-		if no_errors:
-			varname = AST.children[0].children[0].val
-			for i in range(len(st_stack.stack)):
-				for k in range(num_scopes):
-					if st_stack.stack[i].contains(varname, k+1):
-						to_assign_type = st_stack.stack[i].typeof(varname, k+1)
-						if st_stack.stack[i].isreadonly(varname, k+1):
-							error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
-			assign_value_type = gettype(AST.children[1].children[0])
-			if assign_value_type != "error" and assign_value_type != to_assign_type:
-				error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
+		varname = AST.children[0].children[0].val
+		for i in range(len(st_stack.stack)):
+			for k in range(num_scopes):
+				if st_stack.stack[i].contains(varname, k+1):
+					to_assign_type = st_stack.stack[i].typeof(varname, k+1)
+					if st_stack.stack[i].isreadonly(varname, k+1):
+						error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
+		if (assign_value_type == "int" or assign_value_type == "bool" or assign_value_type == "set")  and assign_value_type != to_assign_type:
+			error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
 
 	elif AST.type == "scan":
-		encontrado = False
-		for i in range(num_scopes):
-			if st_stack.stack[0].contains(AST.children[0].children[0].val, i+1):
-				encontrado = True
-		if not encontrado:
-			error_st.append(("nodec", AST.children[0].children[0].val, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
+		name = AST.children[0].children[0].val
+		if not vardeclared(name):
+			error_st.append(("nodec", name, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 
 	elif AST.type == "print":
 		var_list = getvar_list(AST)
+		no_errors = True
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
-			actual_num_scopes = len(st_stack.stack)
-			declared = False
-			while(actual_num_scopes > 0):
-				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
-					declared = True
-				actual_num_scopes = actual_num_scopes - 1
-			if not declared:
+			if not vardeclared(name):
+				no_erros = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
+		if no_errors:
+			gettype(AST.children[0].children[0])
+
 
 	elif AST.type == "if_stmt" or AST.type == "while_stmt":
 		var_list = getvar_list(AST.children[0])
+		stmt_type = str(gettype(AST.children[0].children[0]))
 		aux = []
 		no_errors = True
 		lin_dec, col_dec, lineno, colno = 0, 0, 0, 0
@@ -164,22 +147,15 @@ def build_symbol_table_REC(AST):
 			name = var[0]
 			lin_dec = var[1]
 			col_dec = var[2]
-			actual_num_scopes = len(st_stack.stack)
-			declared = False
-			while(actual_num_scopes > 0):
-				if st_stack.stack[actual_num_scopes - 1].contains(name, actual_num_scopes):
-					declared = True
-				actual_num_scopes = actual_num_scopes - 1
-			if not declared:
+			if not vardeclared(name):
 				no_errors = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
 		if no_errors:
-			act_type = gettype(AST.children[0].children[0])
-			if act_type != "bool" and act_type != "error":
+			if stmt_type != "bool" and stmt_type != "error":
 				if len(aux) > 0:
 					lineno = aux[0][1]
 					colno = aux[0][2]
-				error_st.append(("inv_tex", AST.val, lineno, colno, act_type))
+				error_st.append(("inv_tex", AST.val, lineno, colno, "bool", act_type))
 
 
 	# Recorre los hijos del nodo actual
@@ -189,6 +165,9 @@ def build_symbol_table_REC(AST):
 
 	# Si es un nodo FOR, cierra el Scope al salir
 	if AST.type == "for_stmt":
+		fortype = gettype(AST.children[3])
+		if fortype != "set":
+			error_st.append(("inv_tex", AST.val, AST.children[3].lineno, AST.children[3].colno, "set", fortype))
 		pop_stack_to_st()
 
 
@@ -197,6 +176,13 @@ def build_symbol_table(AST):
 	if len(error_st) == 0: return strrep_st
 	else: return None
 
+def vardeclared(varname):
+	for i in range(len(st_stack.stack)):
+		for k in range(num_scopes):
+			if st_stack.stack[i].contains(varname, k+1):
+				return True
+	return False
+
 def gettype(AST):
 	# Casos base
 	if AST.type == "int_stmt" or AST.type == "set_stmt":
@@ -204,11 +190,14 @@ def gettype(AST):
 	if AST.type == "const_stmt":
 		return "bool"
 	if AST.type == "var_stmt":
+		found = False
 		for i in range(len(st_stack.stack)):
 			for k in range(num_scopes):
 				if st_stack.stack[i].contains(AST.children[0].val, k+1):
 					to_assign_type = st_stack.stack[i].typeof(AST.children[0].val, k+1)
-		return to_assign_type
+					found = True
+		if found: return to_assign_type
+		else: return "error"
 
 	# Operadores
 	if AST.type == "expr_binopr":

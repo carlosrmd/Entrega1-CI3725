@@ -1,0 +1,26 @@
+program {
+    using int a; set a, b; bool b, c; in
+
+    { using set a; in scan a; print a; };
+
+    print a, b + a;
+
+    b = {1,2,3,4};
+
+    for i min >? b do {
+        i = 10;
+        print i;
+        i = i + 1;
+    };
+
+    if (i @ b and >? b)
+        print b
+    ;
+
+    repeat {
+        using int i, a; in
+        print i;
+    } while (true + 2) do {
+        scan i;
+    };
+}
