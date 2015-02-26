@@ -81,15 +81,7 @@ def main(argv  = None):
 
 	# Imprimir resultados
 
-	if len(error_lex) == 0:	# Lista de error vacía, se imprimen los tokens correctos
-		if "-t" in argv:
-			print("\nTokens List:\n")
-			for t in out:
-				if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
-					print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
-				else:
-					print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
-	else:				# Lista de error del lexer no vacía, se imprimen solo los tokens de error encontrados
+	if len(error_lex) != 0:	# Lista de error no vacía
 		for t in error_lex:
 			print("Error: Se encontró un caracter inesperado \"" + t.value[0] + "\" en la línea " + str(t.lineno) + ", columna " + getcol(t.lineno, t.lexpos) + ".")
 		exit(0)
@@ -104,15 +96,27 @@ def main(argv  = None):
 		if len(error_par) != 0:		# Lista de error del parser no vacia, se imprime solo el primer token de error de sintaxis encontrado
 			p = error_par[0]
 			print("Error de sintaxis: Token '" + str(p.value) + "' inesperado en línea " + str(p.lineno) + ", columna " + getcol(p.lineno, p.lexpos) + ".")
-		
+			exit(0)
+
 		if AST:
-			if "-a" in argv:
+			if "-s" in argv: 
+				SymTab = sl_typecheck.build_symbol_table(AST)
+				if sl_typecheck.get_errors(): error_st = sl_typecheck.get_errors()
+
+			if "-t" in argv and len(error_st) == 0:
+				print("\nTokens List:\n")
+				for t in out:
+					if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
+						print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
+					else:
+						print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
+	
+
+			if "-a" in argv and len(error_st) == 0:
 				print("\nAST:\n")
 				print(AST)
 
 			if "-s" in argv:
-				SymTab = sl_typecheck.build_symbol_table(AST)
-				if sl_typecheck.get_errors(): error_st = sl_typecheck.get_errors()
 				if len(error_st) != 0:
 					for st in error_st:
 						err_type = st[0]
