@@ -65,9 +65,8 @@ def build_symbol_table_REC(AST):
 		elif type == "bool": val = "false"
 		lin_dec = AST.lineno
 		col_dec = AST.colno
-
 		for i in range(num_scopes):
-			if st_stack.stack[-1].contains(name, i):
+			if st_stack.stack[-1].contains(name, i+1):
 				error_st.append(("redec", name, lin_dec, col_dec))
 		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
 
