@@ -66,8 +66,9 @@ def build_symbol_table_REC(AST):
 		lin_dec = AST.lineno
 		col_dec = AST.colno
 
-		if vardeclared(name):
-			error_st.append(("redec", name, lin_dec, col_dec))
+		for i in range(num_scopes):
+			if st_stack.stack[-1].contains(name, i):
+				error_st.append(("redec", name, lin_dec, col_dec))
 		st_stack.top().insert(name, dec_scope, type, val, lin_dec)
 
 		strrep_st = strrep_st + "\t"*indent_level + str(st_stack.top().var_str(name, dec_scope)) + "\n"
