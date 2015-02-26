@@ -87,6 +87,15 @@ def main(argv  = None):
 		exit(0)
 
 
+	if "-t" in argv and not ("-a" in argv or "-s" in argv):
+		print("\nTokens List:\n")
+		for t in out:
+			if(t.type == "IDENTIFIER" or t.type == "SETSUBSTRACT" or t.type == "GREATERTHAN"):
+				print("token " + str(t.type) + "\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
+			else:
+				print("token " + str(t.type) + "\t\tvalue (" + str(t.value) + ") at line " + str(t.lineno) + ", column " + getcol(t.lineno, t.lexpos))
+	
+	
 	if "-a" in argv or "-s" in argv:
 		sl_lexer.lexer.lineno = 1	# Reinicia el contador de lineas del lexer/parser
 		
