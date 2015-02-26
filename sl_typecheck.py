@@ -103,6 +103,7 @@ def build_symbol_table_REC(AST):
 		assign_value_type = str(gettype(AST.children[1].children[0]))
 		varname = AST.children[0].children[0].val
 		no_errors = True
+		readonly = False
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
@@ -116,8 +117,11 @@ def build_symbol_table_REC(AST):
 					if st_stack.stack[i].contains(varname, k+1):
 						to_assign_type = st_stack.stack[i].typeof(varname, k+1)
 						if st_stack.stack[i].isreadonly(varname, k+1):
-							error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
-
+							readonly = True
+						else:
+							readonly = False
+			if readonly:
+				error_st.append(("read_ol", varname, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 			if (assign_value_type == "int" or assign_value_type == "bool" or assign_value_type == "set")  and assign_value_type != to_assign_type:
 				error_st.append(("inv_assign", "=" , AST.children[0].children[0].lineno, AST.children[0].children[0].colno, to_assign_type, assign_value_type))
 
