@@ -170,7 +170,7 @@ def build_symbol_table_REC(AST):
 	# Si es un nodo FOR, cierra el Scope al salir
 	if AST.type == "for_stmt":
 		fortype = gettype(AST.children[3])
-		if fortype != "set":
+		if fortype != "set" and != "error":
 			error_st.append(("inv_tex", AST.val, AST.children[3].lineno, AST.children[3].colno, "set", fortype))
 		var_list = getvar_list(AST)
 		for var in var_list:
