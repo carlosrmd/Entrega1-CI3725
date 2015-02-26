@@ -143,7 +143,7 @@ def main(argv  = None):
 						elif err_type == "inv_boolneg":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": No es posible negar booleanamente expresiones de tipo '" + str(inv_type1) + "'.")
 						elif err_type == "inv_setunopr":
-							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Operador '" + str(value) + "' no sirve con expresiones de tipo " + str(inv_type1) + "'.")
+							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Operador '" + str(value) + "' no sirve con expresiones de tipo '" + str(inv_type1) + "'.")
 						elif err_type == "read_ol":
 							print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable de iteración '" + str(value) + "' no puede ser modificada.")
 				else:
