@@ -125,6 +125,10 @@ def build_symbol_table_REC(AST):
 		name = AST.children[0].children[0].val
 		if not vardeclared(name):
 			error_st.append(("nodec", name, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
+		name_type = gettype(AST.children[0])
+		if name_type == "set":
+			error_st.append(("inv_tex", AST.val, AST.children[0].children[0].lineno, AST.children[0].children[0].colno, "int' o 'bool", name_type))
+			
 
 	elif AST.type == "print":
 		var_list = getvar_list(AST)
@@ -172,7 +176,7 @@ def build_symbol_table_REC(AST):
 		fortype = gettype(AST.children[3])
 		if fortype != "set" and fortype != "error":
 			error_st.append(("inv_tex", AST.val, AST.children[3].lineno, AST.children[3].colno, "set", fortype))
-		var_list = getvar_list(AST)
+		var_list = getvar_list(AST.children[3])
 		for var in var_list:
 			name = var[0]
 			lin_dec = var[1]
