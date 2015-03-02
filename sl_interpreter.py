@@ -16,18 +16,25 @@ error_intr = []
 SymTab = None
 num_scopes = 0
 indent_level = 0
+scopes_stack = []
 
 def interpreter_traverser(AST):
 	global error_intr
 	global num_scopes
 	global indent_level
-
+	global scopes_stack
 	if AST.type == "block":
 		num_scopes += 1
 		indent_level += 1
+		scopes_stack.append(num_scopes)
+
+	elif AST.type == "for_stmt":
+		num_scopes += 1
+		scopes_stack.append(num_scopes)
 
 	elif AST.type == "block_end":
 		indent_level -= 1
+		scopes_stack.pop()
 
 	elif AST.type == "print":
 		elements = AST.children[0].children
@@ -44,8 +51,11 @@ def interpreter_traverser(AST):
 					string = string + act[-1]
 			if elem.type == "var_stmt":
 				varname = elem.children[0].val
-				string += str(SymTab.valof(varname, num_scopes))
-
+				temp_list = sorted(scopes_stack)
+				for scope in temp_list:
+					if SymTab.contains(varname, scope):
+						value = SymTab.valof(varname, scope)
+				string += str(value)
 		printf(string)
 
 	elif AST.type == "scan":
@@ -85,13 +95,16 @@ def interpreter_traverser(AST):
 		assign_var_type = SymTab.typeof(assign_var, num_scopes)
 		expr = AST.children[1].children[0]
 		expr_val = evaluate(expr)
+		for scope in scopes_stack:
+			if SymTab.contains(assign_var, scope):
+				act_scope = scope
 		if assign_var_type == "int":
-			SymTab.update(assign_var, num_scopes, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
+			SymTab.update(assign_var, act_scope, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
 		elif assign_var_type == "bool":
 			if expr_val:
-				SymTab.update(assign_var, num_scopes, assign_var_type, "true", SymTab.lin_decof(assign_var, num_scopes))
+				SymTab.update(assign_var, act_scope, assign_var_type, "true", SymTab.lin_decof(assign_var, num_scopes))
 			else:
-				SymTab.update(assign_var, num_scopes, assign_var_type, "false", SymTab.lin_decof(assign_var, num_scopes))
+				SymTab.update(assign_var, act_scope, assign_var_type, "false", SymTab.lin_decof(assign_var, num_scopes))
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -99,6 +112,9 @@ def interpreter_traverser(AST):
 			ch = interpreter_traverser(child)
 			if ch == False:
 				return False
+
+	if AST.type == "for_stmt":
+		scopes_stack.pop()
 
 
 def execute(AST, ST):
@@ -118,8 +134,8 @@ def evaluate(expr):
 		if expr.type == "set_stmt":
 			actual_set = []
 			for child in expr.children:
-				actual_set.append(evaluate(child))
-			return actual_set
+				actual_set.append(int(evaluate(child)))
+			return set(actual_set)
 		else:
 			return expr.children[0].val
 	if expr.type == "const_stmt":
@@ -167,23 +183,65 @@ def evaluate(expr):
 	# Operadores de conjuntos
 
 	if expr.type == "expr_setcont":
-		opr_a = evaluate(expr.children[0])
+		opr_a = int(evaluate(expr.children[0]))
 		opr_b = evaluate(expr.children[1])
-		pass
+		return opr_a in opr_b
 
 	if expr.type == "set_binopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		pass
+		if expr.val.split()[1] == "++":
+			for elem in opr_b:
+				opr_a.add(elem)
+			return opr_a
+		elif expr.val.split()[1] == "><":
+			new_set = set([])
+			for elem in opr_a:
+				if elem in opr_b:
+					new_set.add(elem)
+			return new_set
+		elif expr.val.split()[1] == "\\":
+			new_set = set([])
+			for elem in opr_a:
+				if not elem in opr_b:
+					new_set.add(elem)
+			return new_set
 
 	if expr.type == "set_mapopr":
-		opr_a = evaluate(expr.children[0])
+		opr_a = int(evaluate(expr.children[0]))
 		opr_b = evaluate(expr.children[1])
-		pass
+		if expr.val.split()[1] == "<+>":
+			new_set = set([])
+			for elem in opr_b:
+				new_set.add(opr_a + elem)
+			return new_set
+		elif expr.val.split()[1] == "<->":
+			new_set = set([])
+			for elem in opr_b:
+				new_set.add(opr_a - elem)
+			return new_set
+		elif expr.val.split()[1] == "<*>":
+			new_set = set([])
+			for elem in opr_b:
+				new_set.add(opr_a * elem)
+			return new_set
+		elif expr.val.split()[1] == "</>":
+			new_set = set([])
+			for elem in opr_b:
+				new_set.add(opr_a / elem)
+			return new_set
+		elif expr.val.split()[1] == "<%>":
+			new_set = set([])
+			for elem in opr_b:
+				new_set.add(opr_a % elem)
+			return new_set
 
 	if expr.type == "set_unropr":
 		opr_a = evaluate(expr.children[0])
-		pass
+		if expr.val.split()[1] == ">?": return max(opr_a)
+		if expr.val.split()[1] == "<?": return min(opr_a)
+		if expr.val.split()[1] == "$?": return len(opr_a)
+
 
 
 def get_errors():

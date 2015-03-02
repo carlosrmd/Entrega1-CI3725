@@ -135,6 +135,8 @@ def main(argv  = None):
 				print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Operador '" + str(value) + "' no sirve con expresiones de tipo '" + str(inv_type1) + "'.")
 			elif err_type == "read_ol":
 				print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": La variable de iteración '" + str(value) + "' no puede ser modificada.")
+			elif err_type == "inv_set":
+				print("Error en la linea " + str(lineno) + ", columna " + getcol(lineno, lexpos) + ": Tipo 'set' solo puede tener elementos de tipo 'int'.")
 		exit(0)
 
 
@@ -164,6 +166,7 @@ def main(argv  = None):
 
 
 	##### INTERPRETA EL PROGRAMA #####
+	print(SymTab)
 	sl_interpreter.execute(AST, SymTab)
 	if sl_interpreter.get_errors(): 
 		error_intr = sl_interpreter.get_errors()

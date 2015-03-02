@@ -207,7 +207,8 @@ def gettype(AST):
 	if AST.type == "int_stmt" or AST.type == "set_stmt":
 		if AST.type == "set_stmt":
 			for child in AST.children:
-				gettype(child)
+				if gettype(child) != "int":
+					error_st.append(("inv_set", 0 , child.children[0].lineno, child.children[0].colno))
 		return AST.val
 	if AST.type == "const_stmt":
 		return "bool"
