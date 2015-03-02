@@ -1,0 +1,10 @@
+program {
+	using
+		int a;
+		bool b;
+	in
+	print "Introduzca un número: ";
+	scan a;
+	print "Introduzca un booleano: ";
+	scan b;
+}

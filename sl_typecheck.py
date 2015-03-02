@@ -192,7 +192,7 @@ def build_symbol_table_REC(AST):
 
 def build_symbol_table(AST):
 	build_symbol_table_REC(AST)
-	if len(error_st) == 0: return strrep_st
+	if len(error_st) == 0: return symbol_table_final
 	else: return None
 
 def vardeclared(varname):
@@ -313,6 +313,7 @@ def getvar_list(AST):
 			var_list.append(toappend)
 	return var_list
 
+
 def getvars(AST):
 	if AST.val == "variable":
 		return AST.children[0].val + "," + str(AST.children[0].lineno) + "," + str(AST.children[0].colno)
@@ -331,6 +332,7 @@ def getvars(AST):
 			toreturn = toreturn + "+" + getvars(child)
 		return toreturn
 
+
 def pop_stack_to_st():
 	global strrep_st
 	global indent_level
@@ -347,8 +349,5 @@ def get_errors():
 	return error_st
 
 
-# PRUEBAS - QUITAR!
 def tostring_symbol_table():
-	#return str(st_stack)
-	#return str(symbol_table_final.st)
-	pass
+	return strrep_st[:-1]
