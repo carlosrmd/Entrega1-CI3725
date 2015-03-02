@@ -179,6 +179,8 @@ def main(argv  = None):
 			print("ERROR: No se le puede asignar a la variable '" + str(value) + "' de tipo '" + str(varType) + "' una entrada de tipo '" + str(valueType) + "' en la fila " + str(lin) + ", columna " + str(col) + ".")
 		elif err_type == "inv_norec_scan":
 			print("ERROR: No se reconoce la entrada.")
+		elif err_type == "div_by_zero":
+			print("ERROR: División por cero en la fila " + str(lin) + " columna " + str(col))
 
 
 
