@@ -49,13 +49,6 @@ def interpreter_traverser(AST):
 					string = string + act[i] + "\n"
 				if act[-1] != "''":
 					string = string + act[-1]
-			elif elem.type == "var_stmt":
-				varname = elem.children[0].val
-				temp_list = sorted(scopes_stack)
-				for scope in temp_list:
-					if SymTab.contains(varname, scope):
-						value = SymTab.valof(varname, scope)
-				string += str(value)
 			else:
 				act_value = evaluate(elem)
 				act_string = str(act_value)
@@ -126,6 +119,15 @@ def interpreter_traverser(AST):
 			else:
 				SymTab.update(assign_var, act_scope, assign_var_type, strto_assign[:-1]+"}", SymTab.lin_decof(assign_var, num_scopes))
 
+	elif AST.type == "if_stmt":
+		if_expr = AST.children[0].children[0]
+		if evaluate(if_expr):
+			interpreter_traverser(AST.children[1])
+		return
+
+	elif AST.type == "while_stmt":
+		pass
+
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -165,11 +167,13 @@ def evaluate(expr):
 		for scope in scopes_stack:
 			if SymTab.contains(expr.children[0].val, scope):
 				act_scope = scope
-		vartype = SymTab.typeof(expr.children[0].val, scope)
-		if vartype == "int" or vartype == "bool":
-			return SymTab.valof(expr.children[0].val, scope)
+		vartype = SymTab.typeof(expr.children[0].val, act_scope)
+		if vartype == "int":
+			return SymTab.valof(expr.children[0].val, act_scope)
+		elif vartype == "bool":
+			return SymTab.valof(expr.children[0].val, act_scope) == "true"
 		elif vartype == "set":
-			actual_set = SymTab.valof(expr.children[0].val, scope)
+			actual_set = SymTab.valof(expr.children[0].val, act_scope)
 			if actual_set == "{}":
 				return set([])
 			else:
