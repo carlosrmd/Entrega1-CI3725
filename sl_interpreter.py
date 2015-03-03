@@ -49,13 +49,15 @@ def interpreter_traverser(AST):
 					string = string + act[i] + "\n"
 				if act[-1] != "''":
 					string = string + act[-1]
-			if elem.type == "var_stmt":
+			elif elem.type == "var_stmt":
 				varname = elem.children[0].val
 				temp_list = sorted(scopes_stack)
 				for scope in temp_list:
 					if SymTab.contains(varname, scope):
 						value = SymTab.valof(varname, scope)
 				string += str(value)
+			else:
+				string += str(evaluate(elem))
 		printf(string)
 
 	elif AST.type == "scan":
@@ -105,6 +107,15 @@ def interpreter_traverser(AST):
 				SymTab.update(assign_var, act_scope, assign_var_type, "true", SymTab.lin_decof(assign_var, num_scopes))
 			else:
 				SymTab.update(assign_var, act_scope, assign_var_type, "false", SymTab.lin_decof(assign_var, num_scopes))
+		elif assign_var_type == "set":
+			strto_assign = "{"
+			for elem in expr_val:
+				strto_assign += str(elem) + ","
+			if strto_assign == "{":
+				SymTab.update(assign_var, act_scope, assign_var_type, "{}", SymTab.lin_decof(assign_var, num_scopes))
+			else:
+				SymTab.update(assign_var, act_scope, assign_var_type, strto_assign[:-1]+"}", SymTab.lin_decof(assign_var, num_scopes))
+
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
@@ -141,7 +152,21 @@ def evaluate(expr):
 	if expr.type == "const_stmt":
 		return expr.children[0].val == "true"
 	if expr.type == "var_stmt":
-		return SymTab.valof(expr.children[0].val, num_scopes)
+		for scope in scopes_stack:
+			if SymTab.contains(expr.children[0].val, scope):
+				act_scope = scope
+		vartype = SymTab.typeof(expr.children[0].val, scope)
+		if vartype == "int" or vartype == "bool":
+			return SymTab.valof(expr.children[0].val, scope)
+		elif vartype == "set":
+			actual_set = SymTab.valof(expr.children[0].val, scope)
+			if actual_set == "{}":
+				return set([])
+			else:
+				actual_set = actual_set[1:-1].split(",")
+				for i in range(len(actual_set)):
+					actual_set[i] = int(actual_set[i])
+				return set(actual_set)
 
 	# Operadores de enteros
 	if expr.type == "expr_binopr":

@@ -166,7 +166,6 @@ def main(argv  = None):
 
 
 	##### INTERPRETA EL PROGRAMA #####
-	print(SymTab)
 	sl_interpreter.execute(AST, SymTab)
 	if sl_interpreter.get_errors(): 
 		error_intr = sl_interpreter.get_errors()
