@@ -183,6 +183,8 @@ def main(argv  = None):
 			print("ERROR: No se reconoce la entrada.")
 		elif err_type == "div_by_zero":
 			print("ERROR: División por cero en la fila " + str(lin) + " columna " + str(col))
+		elif err_type == "inv_empty_set":
+			print("ERROR: Línea " + str(lin) + " columna " + str(col) + ". El operador '" + value + "' no acepta conjuntos vacios.")
 
 
 

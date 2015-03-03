@@ -57,7 +57,17 @@ def interpreter_traverser(AST):
 						value = SymTab.valof(varname, scope)
 				string += str(value)
 			else:
-				string += str(evaluate(elem))
+				act_value = evaluate(elem)
+				act_string = str(act_value)
+				if act_string[:3] == "set":
+					act_string = "{"
+					for elem in act_value:
+						act_string += str(elem) + ","
+					if act_string == "{":
+						act_string = "{}"
+					else:
+						act_string = act_string[:-1] + "}"
+				string += act_string
 		printf(string)
 
 	elif AST.type == "scan":
@@ -263,9 +273,10 @@ def evaluate(expr):
 
 	if expr.type == "set_unropr":
 		opr_a = evaluate(expr.children[0])
-		if expr.val.split()[1] == ">?": return max(opr_a)
-		if expr.val.split()[1] == "<?": return min(opr_a)
-		if expr.val.split()[1] == "$?": return len(opr_a)
+		if expr.val.split()[1] == ">?" and len(opr_a) > 0: return max(opr_a)
+		if expr.val.split()[1] == "<?" and len(opr_a) > 0: return min(opr_a)
+		if expr.val.split()[1] == "$?" and len(opr_a) > 0: return len(opr_a)
+		error_intr.append(("inv_empty_set", expr.val.split()[1], expr.lineno, expr.colno))
 
 
 
