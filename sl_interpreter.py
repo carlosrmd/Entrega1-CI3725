@@ -65,7 +65,10 @@ def interpreter_traverser(AST):
 
 	elif AST.type == "scan":
 		variable = AST.children[0].children[0]
-		varType = SymTab.typeof(variable.val, num_scopes)
+		for scope in scopes_stack:
+			if SymTab.contains(variable.val, scope):
+				act_scope = scope
+		varType = SymTab.typeof(variable.val, act_scope)
 		
 		value = read()
 		value = value.split("\n")[0]
@@ -92,17 +95,17 @@ def interpreter_traverser(AST):
 				error_intr.append(("inv_norec_scan", variable.val, variable.lineno, variable.colno))
 				return False
 		else:
-			SymTab.update(variable.val, num_scopes, varType, value, SymTab.lin_decof(variable.val, num_scopes))
+			SymTab.update(variable.val, act_scope, varType, value, SymTab.lin_decof(variable.val, num_scopes))
 
 
 	elif AST.type == "assign":
 		assign_var = AST.children[0].children[0].val
-		assign_var_type = SymTab.typeof(assign_var, num_scopes)
 		expr = AST.children[1].children[0]
 		expr_val = evaluate(expr)
 		for scope in scopes_stack:
 			if SymTab.contains(assign_var, scope):
 				act_scope = scope
+		assign_var_type = SymTab.typeof(assign_var, act_scope)
 		if assign_var_type == "int":
 			SymTab.update(assign_var, act_scope, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
 		elif assign_var_type == "bool":
