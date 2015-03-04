@@ -189,7 +189,8 @@ def p_term_id(p):
 	p[0] = [Node("var_stmt", p[1], "variable")]
 
 def p_set(p):
-	'''set : LCURLY setelem RCURLY'''
+	'''set : LCURLY empty RCURLY
+		   | LCURLY setelem RCURLY'''
 	p[0] = p[2]
 
 def p_setelem(p):

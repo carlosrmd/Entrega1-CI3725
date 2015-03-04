@@ -126,18 +126,60 @@ def interpreter_traverser(AST):
 		if_expr = AST.children[0].children[0]
 		if evaluate(if_expr):
 			interpreter_traverser(AST.children[1])
+		else:
+			if len(AST.children) > 2:
+				interpreter_traverser(AST.children[2])
 		return
 
-	elif AST.type == "while_stmt":
-		pass
+	if AST.type == "for_stmt":
+		iter_var = AST.children[0].children[0].val
+		iter_dir = AST.children[1].children[0].val
+		iter_set = evaluate(AST.children[3])
+		do_stmt = AST.children[4]
+		iter_list = sorted(iter_set)
 
+		for scope in scopes_stack:
+			if SymTab.contains(iter_var, scope):
+				act_scope = scope
+		if iter_dir == "max": iter_list.reverse()
+		for elem in iter_list:
+			temp_stack = scopes_stack
+			temp_numscopes = num_scopes
+			SymTab.update(iter_var, act_scope, "int", str(elem), SymTab.lin_decof(iter_var, num_scopes))
+			interpreter_traverser(do_stmt)
+			print(temp_numscopes, num_scopes)
+			scopes_stack = temp_stack
+			num_scopes = temp_numscopes
+		return
 
 	# Recorre los hijos del nodo actual
 	if AST.children:
-		for child in AST.children:
-			ch = interpreter_traverser(child)
-			if ch == False:
-				return False
+		to_ignore = []
+		for i in range(len(AST.children)):
+			if not i in to_ignore:
+				if AST.children[i].type == "repeat_stmt":
+					to_ignore.append(i+1)
+
+					if i+1 < len(AST.children)-1:
+						# Caso Repeat, While Do
+						if AST.children[i+2].type == "do_stmt":
+							exec_repeatwhile(AST.children[i], AST.children[i+1], AST.children[i+2])
+						else:
+							# Caso Repeat, While
+							exec_repeatwhile(AST.children[i], AST.children[i+1], None)
+					# Caso Repeat, While tambien
+					else:
+						exec_repeatwhile(AST.children[i], AST.children[i+1], None)
+				elif AST.children[i].type == "while_stmt":
+					exec_while(AST.children[i],AST.children[i+1])
+				elif AST.children[i].type == "do_stmt":
+					pass
+				else:
+					ch = interpreter_traverser(AST.children[i])
+				if ch == False:
+					return False
+
+	# Si era for se cierra el scope actual
 
 	if AST.type == "for_stmt":
 		scopes_stack.pop()
@@ -205,6 +247,7 @@ def evaluate(expr):
 		if expr.val.split()[1] == "<": return opr_a < opr_b
 		if expr.val.split()[1] == ">=": return opr_a >= opr_b
 		if expr.val.split()[1] == "<=": return opr_a <= opr_b
+		if expr.val.split()[1] == "==": return opr_a == opr_b
 
 	if expr.type == "negate_stmt":
 		opr_a = int(evaluate(expr.children[0]))
@@ -233,6 +276,10 @@ def evaluate(expr):
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
 		if expr.val.split()[1] == "++":
+			if len(opr_a) == 0:
+				return opr_b
+			elif len(opr_b) == 0:
+				return opr_a
 			for elem in opr_b:
 				opr_a.add(elem)
 			return opr_a
@@ -285,6 +332,49 @@ def evaluate(expr):
 		if expr.val.split()[1] == "$?" and len(opr_a) > 0: return len(opr_a)
 		error_intr.append(("inv_empty_set", expr.val.split()[1], expr.lineno, expr.colno))
 
+
+def exec_while(while_stmt, do_stmt):
+	global scopes_stack
+	global num_scopes
+	w_condition = while_stmt.children[0].children[0]
+	while evaluate(w_condition):
+		temp_stack = scopes_stack
+		temp_numscopes = num_scopes
+		interpreter_traverser(do_stmt)
+		scopes_stack = temp_stack
+		num_scopes = temp_numscopes
+
+def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
+	global scopes_stack
+	global num_scopes
+	if do_stmt is None:
+		# Repeat While
+		repeatdo_stmt = repeat_stmt.children[0]
+		w_condition = while_stmt.children[0].children[0]
+		temp_stack = scopes_stack
+		temp_numscopes = num_scopes
+		interpreter_traverser(repeatdo_stmt)
+		scopes_stack = temp_stack
+		num_scopes = temp_numscopes
+		while evaluate(w_condition):
+			temp_stack = scopes_stack
+			temp_numscopes = num_scopes
+			interpreter_traverser(repeatdo_stmt)
+			scopes_stack = temp_stack
+			num_scopes = temp_numscopes
+	else:
+		# Repeat While Do
+		repeatdo_stmt = repeat_stmt.children[0]
+		w_condition = while_stmt.children[0].children[0]
+		while True:
+			temp_stack = scopes_stack
+			temp_numscopes = num_scopes
+			interpreter_traverser(repeatdo_stmt)
+			if not evaluate(w_condition):
+				break
+			interpreter_traverser(do_stmt)
+			scopes_stack = temp_stack
+			num_scopes = temp_numscopes
 
 
 def get_errors():
