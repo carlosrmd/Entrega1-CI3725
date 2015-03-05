@@ -51,7 +51,11 @@ def interpreter_traverser(AST):
 					string = string + act[-1]
 			else:
 				act_value = evaluate(elem)
-				act_string = str(act_value)
+				if act_value is True or act_value is False:
+					if act_value: act_string = "true"
+					else: act_string = "false"
+				else:
+					act_string = str(act_value)
 				if act_string[:3] == "set":
 					act_string = "{"
 					for elem in act_value:
@@ -115,6 +119,7 @@ def interpreter_traverser(AST):
 				SymTab.update(assign_var, act_scope, assign_var_type, "false", SymTab.lin_decof(assign_var, num_scopes))
 		elif assign_var_type == "set":
 			strto_assign = "{"
+			expr_val = sorted(expr_val)
 			for elem in expr_val:
 				strto_assign += str(elem) + ","
 			if strto_assign == "{":
@@ -241,13 +246,20 @@ def evaluate(expr):
 				return opr_a / opr_b
 
 	if expr.type == "expr_cmpopr":
-		opr_a = int(evaluate(expr.children[0]))
-		opr_b = int(evaluate(expr.children[1]))
-		if expr.val.split()[1] == ">": return opr_a > opr_b
-		if expr.val.split()[1] == "<": return opr_a < opr_b
-		if expr.val.split()[1] == ">=": return opr_a >= opr_b
-		if expr.val.split()[1] == "<=": return opr_a <= opr_b
-		if expr.val.split()[1] == "==": return opr_a == opr_b
+		opr_a = evaluate(expr.children[0])
+		opr_b = evaluate(expr.children[1])
+		if "set" in str(opr_a):
+			if expr.val.split()[1] == "==": return opr_a == opr_b
+			elif expr.val.split()[1] == "/=": return not opr_a == opr_b
+		else:
+			opr_a = str(opr_a)
+			opr_b = str(opr_b)
+			if expr.val.split()[1] == ">": return opr_a > opr_b
+			elif expr.val.split()[1] == "<": return opr_a < opr_b
+			elif expr.val.split()[1] == ">=": return opr_a >= opr_b
+			elif expr.val.split()[1] == "<=": return opr_a <= opr_b
+			elif expr.val.split()[1] == "==": return opr_a == opr_b
+			elif expr.val.split()[1] == "/=": return not opr_a == opr_b
 
 	if expr.type == "negate_stmt":
 		opr_a = int(evaluate(expr.children[0]))

@@ -236,6 +236,8 @@ def gettype(AST):
 		b = gettype(AST.children[1])
 		if a == b and a == "int":
 			return "bool"
+		if a == b and a == "set" and (AST.val.split()[1] == "==" or AST.val.split()[1] == "/="):
+			return "bool"
 		else:
 			opr = AST.val.split(" ")
 			if a != "error" and b != "error": error_st.append(("inv_opr", opr[1] , AST.lineno, AST.colno, a, b))
