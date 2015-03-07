@@ -171,7 +171,7 @@ def interpreter_traverser(AST):
 			return
 		else:
 			if len(AST.children) > 2:
-				if AST.children[1].children[0].type == "block": num_scopes += 1
+				update_numscopes(AST.children[1])
 				interpreter_traverser(AST.children[2])
 		return
 
@@ -179,6 +179,7 @@ def interpreter_traverser(AST):
 	if AST.children:
 		to_ignore = []
 		for i in range(len(AST.children)):
+			ch = True
 			if not i in to_ignore:
 				if AST.children[i].type == "repeat_stmt":
 					to_ignore.append(i+1)
