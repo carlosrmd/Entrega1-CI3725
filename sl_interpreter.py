@@ -258,6 +258,12 @@ def evaluate(expr):
 		if expr.val.split()[1] == "+": return int(opr_a) + int(opr_b)
 		if expr.val.split()[1] == "-": return int(opr_a) - int(opr_b)
 		if expr.val.split()[1] == "*": return int(opr_a) * int(opr_b)
+		if expr.val.split()[1] == "%":
+			if int(opr_b) == 0:
+				error_intr.append(("mod_by_zero", 0, expr.lineno, expr.colno))
+				return "Fatal"
+			else:
+				return int(opr_a) % int(opr_b)
 		if expr.val.split()[1] == "/":
 			if int(opr_b) == 0:
 				error_intr.append(("div_by_zero", 0, expr.lineno, expr.colno))

@@ -64,7 +64,7 @@ program {
     } while (b < 10) do {
         b = b + 1;
     };
-    for i min c do {
+    for i max c do {
         println "Ahora i es ", i, " en el for 3";
     };
 }
