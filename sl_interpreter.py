@@ -14,6 +14,7 @@ read = stdin.readline
 
 error_intr = []
 SymTab = None
+lines = []
 num_scopes = 0
 indent_level = 0
 scopes_stack = []
@@ -72,7 +73,6 @@ def interpreter_traverser(AST):
 					string = string + act[-1]
 			else:
 				act_value = evaluate(elem)
-				if str(act_value) == "Fatal": return False
 				if act_value is True or act_value is False:
 					if act_value: act_string = "true"
 					else: act_string = "false"
@@ -115,11 +115,11 @@ def interpreter_traverser(AST):
 		if valueType != varType:
 			# Agrega el error a la lista
 			if valueType == "bool" or valueType == "int":
-				error_intr.append(("inv_type_scan", variable.val, variable.lineno, variable.colno, varType, valueType))
-				return False
+				print("ERROR: No se le puede asignar a la variable '" + str(variable.val) + "' de tipo '" + str(varType) + "' una entrada de tipo '" + str(valueType) + "' en la fila " + str(variable.lineno) + ", columna " + str(getcol(variable.lineno,variable.colno)) + ".")
+				exit(1)
 			else:
-				error_intr.append(("inv_norec_scan", variable.val, variable.lineno, variable.colno))
-				return False
+				print("ERROR: No se reconoce la entrada.")
+				exit(1)
 		else:
 			SymTab.update(variable.val, act_scope, varType, value, SymTab.lin_decof(variable.val, num_scopes))
 
@@ -137,13 +137,9 @@ def interpreter_traverser(AST):
 		assign_var = AST.children[0].children[0].val
 		expr = AST.children[1].children[0]
 		expr_val = evaluate(expr)
-		if str(expr_val) == "Fatal": return False
 		for scope in scopes_stack:
 			if SymTab.contains(assign_var, scope):
 				act_scope = scope
-		print(SymTab)
-		print(scopes_stack)
-		print(assign_var, expr_val)
 		assign_var_type = SymTab.typeof(assign_var, act_scope)
 		if assign_var_type == "int":
 			SymTab.update(assign_var, act_scope, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
@@ -203,11 +199,11 @@ def interpreter_traverser(AST):
 				if ch == False:
 					return False
 
-	# Si era for se cierra el scope actual
 
-
-def execute(AST, ST):
+def execute(AST, ST, lineas):
 	global SymTab
+	global lines
+	lines = lineas
 	SymTab = ST
 	inter = interpreter_traverser(AST)
 
@@ -216,16 +212,23 @@ def execute(AST, ST):
 	else:
 		return False
 
+def getcol(lineno, lexpos):
+	global lines
+	aux = 0
+	for i in range(lineno - 1):
+		aux = aux + len(lines[i])
+	return str(lexpos - aux + 1)
+
 
 def evaluate(expr):
+	max_int = 2147483646
 	# Casos base
 	if expr.type == "int_stmt" or expr.type == "set_stmt":
 		if expr.type == "set_stmt":
 			actual_set = []
 			for child in expr.children:
 				toappend = evaluate(child)
-				if str(toappend) == "Fatal": return "Fatal"
-				actual_set.append(toappend)
+				actual_set.append(int(toappend))
 			return set(actual_set)
 		else:
 			return expr.children[0].val
@@ -254,29 +257,29 @@ def evaluate(expr):
 	if expr.type == "expr_binopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
-			return opr_a
-		if expr.val.split()[1] == "+": return int(opr_a) + int(opr_b)
-		if expr.val.split()[1] == "-": return int(opr_a) - int(opr_b)
-		if expr.val.split()[1] == "*": return int(opr_a) * int(opr_b)
-		if expr.val.split()[1] == "%":
+		if expr.val.split()[1] == "+": to_return = int(opr_a) + int(opr_b)
+		elif expr.val.split()[1] == "-": to_return = int(opr_a) - int(opr_b)
+		elif expr.val.split()[1] == "*": to_return = int(opr_a) * int(opr_b)
+		elif expr.val.split()[1] == "%":
 			if int(opr_b) == 0:
-				error_intr.append(("mod_by_zero", 0, expr.lineno, expr.colno))
-				return "Fatal"
+				print("ERROR: Operador módulo por cero en la fila " + str(expr.lineno) + " columna " + str(getcol(expr.lineno, expr.colno)))
+				exit(1)
 			else:
-				return int(opr_a) % int(opr_b)
-		if expr.val.split()[1] == "/":
+				to_return = int(opr_a) % int(opr_b)
+		elif expr.val.split()[1] == "/":
 			if int(opr_b) == 0:
-				error_intr.append(("div_by_zero", 0, expr.lineno, expr.colno))
-				return "Fatal"
+				print("ERROR: División por cero en la fila " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)))
+				exit(1)
 			else:
-				return int(opr_a) / int(opr_b)
+				to_return = int(opr_a) / int(opr_b)
+		if to_return > max_int:
+			print("ERROR. Overflow en la operación en la linea " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)))
+			exit(1)
+		return to_return
 
 	if expr.type == "expr_cmpopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
-			return opr_a
 		if "set" in str(opr_a):
 			if expr.val.split()[1] == "==": return opr_a == opr_b
 			elif expr.val.split()[1] == "/=": return not opr_a == opr_b
@@ -292,8 +295,6 @@ def evaluate(expr):
 
 	if expr.type == "negate_stmt":
 		opr_a = evaluate(expr.children[0])
-		if str(opr_a) == "Fatal":
-			return opr_a
 		return -int(opr_a)
 
 	# Operadores de booleanos
@@ -313,14 +314,11 @@ def evaluate(expr):
 	if expr.type == "expr_setcont":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
-			return "Fatal"
 		return int(opr_a) in opr_b
 
 	if expr.type == "set_binopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal": return "Fatal"
 		if expr.val.split()[1] == "++":
 			if len(opr_a) == 0:
 				return opr_b
@@ -343,14 +341,15 @@ def evaluate(expr):
 			return new_set
 
 	if expr.type == "set_mapopr":
-		opr_a = evaluate(expr.children[0])
+		opr_a = int(evaluate(expr.children[0]))
 		opr_b = evaluate(expr.children[1])
-		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
-			return "Fatal"
-		opr_a = int(opr_a)
 		if expr.val.split()[1] == "<+>":
 			new_set = set([])
 			for elem in opr_b:
+				to_add = opr_a + elem
+				if to_add > max_int:
+					print("ERROR. Overflow en la operación en la linea " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)))
+					exit(1)
 				new_set.add(opr_a + elem)
 			return new_set
 		elif expr.val.split()[1] == "<->":
@@ -361,14 +360,18 @@ def evaluate(expr):
 		elif expr.val.split()[1] == "<*>":
 			new_set = set([])
 			for elem in opr_b:
-				new_set.add(opr_a * elem)
+				to_add = opr_a * elem
+				if to_add > max_int:
+					print("ERROR. Overflow en la operación en la linea " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)))
+					exit(1)
+				new_set.add(to_add)
 			return new_set
 		elif expr.val.split()[1] == "</>":
 			new_set = set([])
 			for elem in opr_b:
 				if elem == 0:
-					error_intr.append(("div_by_zero", 0, expr.lineno, expr.colno))
-					return "Fatal"
+					print("ERROR: División por cero en la fila " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)))
+					exit(1)
 				new_set.add(opr_a / elem)
 			return new_set
 		elif expr.val.split()[1] == "<%>":
@@ -379,11 +382,11 @@ def evaluate(expr):
 
 	if expr.type == "set_unropr":
 		opr_a = evaluate(expr.children[0])
-		if str(opr_a) == "Fatal": return "Fatal"
 		if expr.val.split()[1] == ">?" and len(opr_a) > 0: return max(opr_a)
-		if expr.val.split()[1] == "<?" and len(opr_a) > 0: return min(opr_a)
-		if expr.val.split()[1] == "$?" and len(opr_a) > 0: return len(opr_a)
-		error_intr.append(("inv_empty_set", expr.val.split()[1], expr.lineno, expr.colno))
+		elif expr.val.split()[1] == "<?" and len(opr_a) > 0: return min(opr_a)
+		elif expr.val.split()[1] == "$?": return len(opr_a)
+		print("ERROR: Línea " + str(expr.lineno) + " columna " + str(getcol(expr.lineno,expr.colno)) + ". El operador '" + expr.val.split()[1] + "' no acepta conjuntos vacios.")
+		exit(1)
 
 
 def exec_while(while_stmt, do_stmt):

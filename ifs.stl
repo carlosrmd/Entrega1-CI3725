@@ -1,0 +1,42 @@
+program {
+	using
+		int n;
+	in
+	print "Introduzca un n: ";
+	scan n;
+	if (n == 6) {
+		if (true){
+			using int pedro; in
+			println "n es 6 ;D pero nunca veras el culazo de jose.";
+			if (false) {
+				using int jose; in
+				print "culazo";
+			};
+		};
+	} else {
+		using int pepe; set c; in
+		c = {1,2,3};
+		println "n no es seis pero palante con el comandante.";
+		print "Introduzca pepe: ";
+		scan pepe;
+		println "Pepe es ", pepe;
+		if (pepe == 0) {
+			while (pepe < 10) do {
+				for i min c do {
+					print i, ", ";
+					if (i == 3){
+						print "nos besamos en la boocaaa ";
+					};
+				};
+				println pepe, " veces";
+				pepe = pepe+1;
+
+			};
+		} else {
+			using int mojon; in
+			mojon = 666;
+			println "No es cero :C pero mojon es ", mojon;
+		};
+	};
+	println "Chaito compadre digalo chao a n que vale: ", n;
+}

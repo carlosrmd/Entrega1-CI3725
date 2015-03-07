@@ -166,7 +166,7 @@ def main(argv  = None):
 
 
 	##### INTERPRETA EL PROGRAMA #####
-	sl_interpreter.execute(AST, SymTab)
+	sl_interpreter.execute(AST, SymTab,lineas)
 	if sl_interpreter.get_errors(): 
 		print("\n")
 		error_intr = sl_interpreter.get_errors()
@@ -186,7 +186,8 @@ def main(argv  = None):
 			print("ERROR: División por cero en la fila " + str(lin) + " columna " + str(col))
 		elif err_type == "inv_empty_set":
 			print("ERROR: Línea " + str(lin) + " columna " + str(col) + ". El operador '" + value + "' no acepta conjuntos vacios.")
-
+		elif err_type == "overflow":
+			print("ERROR: Línea " + str(lin) + " columna " + str(col) + ". Overflow en la operación.")
 
 
 if __name__ == "__main__":
