@@ -31,6 +31,29 @@ def interpreter_traverser(AST):
 	elif AST.type == "for_stmt":
 		num_scopes += 1
 		scopes_stack.append(num_scopes)
+		iter_var = AST.children[0].children[0].val
+		iter_dir = AST.children[1].children[0].val
+		iter_set = evaluate(AST.children[3])
+		if str(iter_set) == "Fatal": return
+		do_stmt = AST.children[4]
+		iter_list = sorted(iter_set)
+		print(SymTab)
+		print(num_scopes)
+		print(scopes_stack)
+		for scope in scopes_stack:
+			if SymTab.contains(iter_var, scope):
+				act_scope = scope
+		if iter_dir == "max": iter_list.reverse()
+		for elem in iter_list:
+			temp_stack = scopes_stack
+			temp_numscopes = num_scopes
+			SymTab.update(iter_var, act_scope, "int", str(elem), SymTab.lin_decof(iter_var, num_scopes))
+			interpreter_traverser(do_stmt)
+			scopes_stack = temp_stack
+			num_scopes = temp_numscopes
+		num_scopes += 1
+		scopes_stack.pop()
+		return
 
 	elif AST.type == "block_end":
 		indent_level -= 1
@@ -101,11 +124,21 @@ def interpreter_traverser(AST):
 		else:
 			SymTab.update(variable.val, act_scope, varType, value, SymTab.lin_decof(variable.val, num_scopes))
 
+	elif AST.type == "vardec":
+		vardec = str(AST.val)
+		vartype = vardec.split()[0]
+		varname = vardec.split()[1]
+		if vartype == "int": val = "0"
+		elif vartype == "bool": val = "false"
+		elif vartype == "set": val = "{}"
+		SymTab.update(varname, num_scopes, vartype, val, SymTab.lin_decof(varname, num_scopes))
+
 
 	elif AST.type == "assign":
 		assign_var = AST.children[0].children[0].val
 		expr = AST.children[1].children[0]
 		expr_val = evaluate(expr)
+		if str(expr_val) == "Fatal": return False
 		for scope in scopes_stack:
 			if SymTab.contains(assign_var, scope):
 				act_scope = scope
@@ -131,30 +164,11 @@ def interpreter_traverser(AST):
 		if_expr = AST.children[0].children[0]
 		if evaluate(if_expr):
 			interpreter_traverser(AST.children[1])
+			return
 		else:
 			if len(AST.children) > 2:
+				num_scopes += 1
 				interpreter_traverser(AST.children[2])
-		return
-
-	if AST.type == "for_stmt":
-		iter_var = AST.children[0].children[0].val
-		iter_dir = AST.children[1].children[0].val
-		iter_set = evaluate(AST.children[3])
-		do_stmt = AST.children[4]
-		iter_list = sorted(iter_set)
-
-		for scope in scopes_stack:
-			if SymTab.contains(iter_var, scope):
-				act_scope = scope
-		if iter_dir == "max": iter_list.reverse()
-		for elem in iter_list:
-			temp_stack = scopes_stack
-			temp_numscopes = num_scopes
-			SymTab.update(iter_var, act_scope, "int", str(elem), SymTab.lin_decof(iter_var, num_scopes))
-			interpreter_traverser(do_stmt)
-			print(temp_numscopes, num_scopes)
-			scopes_stack = temp_stack
-			num_scopes = temp_numscopes
 		return
 
 	# Recorre los hijos del nodo actual
@@ -186,9 +200,6 @@ def interpreter_traverser(AST):
 
 	# Si era for se cierra el scope actual
 
-	if AST.type == "for_stmt":
-		scopes_stack.pop()
-
 
 def execute(AST, ST):
 	global SymTab
@@ -207,7 +218,9 @@ def evaluate(expr):
 		if expr.type == "set_stmt":
 			actual_set = []
 			for child in expr.children:
-				actual_set.append(int(evaluate(child)))
+				toappend = evaluate(child)
+				if str(toappend) == "Fatal": return "Fatal"
+				actual_set.append(toappend)
 			return set(actual_set)
 		else:
 			return expr.children[0].val
@@ -234,26 +247,31 @@ def evaluate(expr):
 
 	# Operadores de enteros
 	if expr.type == "expr_binopr":
-		opr_a = int(evaluate(expr.children[0]))
-		opr_b = int(evaluate(expr.children[1]))
-		if expr.val.split()[1] == "+": return opr_a + opr_b
-		if expr.val.split()[1] == "-": return opr_a - opr_b
-		if expr.val.split()[1] == "*": return opr_a * opr_b
+		opr_a = evaluate(expr.children[0])
+		opr_b = evaluate(expr.children[1])
+		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
+			return opr_a
+		if expr.val.split()[1] == "+": return int(opr_a) + int(opr_b)
+		if expr.val.split()[1] == "-": return int(opr_a) - int(opr_b)
+		if expr.val.split()[1] == "*": return int(opr_a) * int(opr_b)
 		if expr.val.split()[1] == "/":
-			if opr_b == 0:
+			if int(opr_b) == 0:
 				error_intr.append(("div_by_zero", 0, expr.lineno, expr.colno))
+				return "Fatal"
 			else:
-				return opr_a / opr_b
+				return int(opr_a) / int(opr_b)
 
 	if expr.type == "expr_cmpopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
+		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
+			return opr_a
 		if "set" in str(opr_a):
 			if expr.val.split()[1] == "==": return opr_a == opr_b
 			elif expr.val.split()[1] == "/=": return not opr_a == opr_b
 		else:
-			opr_a = str(opr_a)
-			opr_b = str(opr_b)
+			opr_a = int(opr_a)
+			opr_b = int(opr_b)
 			if expr.val.split()[1] == ">": return opr_a > opr_b
 			elif expr.val.split()[1] == "<": return opr_a < opr_b
 			elif expr.val.split()[1] == ">=": return opr_a >= opr_b
@@ -262,8 +280,10 @@ def evaluate(expr):
 			elif expr.val.split()[1] == "/=": return not opr_a == opr_b
 
 	if expr.type == "negate_stmt":
-		opr_a = int(evaluate(expr.children[0]))
-		return -opr_a
+		opr_a = evaluate(expr.children[0])
+		if str(opr_a) == "Fatal":
+			return opr_a
+		return -int(opr_a)
 
 	# Operadores de booleanos
 
@@ -280,13 +300,16 @@ def evaluate(expr):
 	# Operadores de conjuntos
 
 	if expr.type == "expr_setcont":
-		opr_a = int(evaluate(expr.children[0]))
+		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
-		return opr_a in opr_b
+		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
+			return "Fatal"
+		return int(opr_a) in opr_b
 
 	if expr.type == "set_binopr":
 		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
+		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal": return "Fatal"
 		if expr.val.split()[1] == "++":
 			if len(opr_a) == 0:
 				return opr_b
@@ -309,8 +332,11 @@ def evaluate(expr):
 			return new_set
 
 	if expr.type == "set_mapopr":
-		opr_a = int(evaluate(expr.children[0]))
+		opr_a = evaluate(expr.children[0])
 		opr_b = evaluate(expr.children[1])
+		if str(opr_a) == "Fatal" or str(opr_b) == "Fatal":
+			return "Fatal"
+		opr_a = int(opr_a)
 		if expr.val.split()[1] == "<+>":
 			new_set = set([])
 			for elem in opr_b:
@@ -329,6 +355,9 @@ def evaluate(expr):
 		elif expr.val.split()[1] == "</>":
 			new_set = set([])
 			for elem in opr_b:
+				if elem == 0:
+					error_intr.append(("div_by_zero", 0, expr.lineno, expr.colno))
+					return "Fatal"
 				new_set.add(opr_a / elem)
 			return new_set
 		elif expr.val.split()[1] == "<%>":
@@ -339,6 +368,7 @@ def evaluate(expr):
 
 	if expr.type == "set_unropr":
 		opr_a = evaluate(expr.children[0])
+		if str(opr_a) == "Fatal": return "Fatal"
 		if expr.val.split()[1] == ">?" and len(opr_a) > 0: return max(opr_a)
 		if expr.val.split()[1] == "<?" and len(opr_a) > 0: return min(opr_a)
 		if expr.val.split()[1] == "$?" and len(opr_a) > 0: return len(opr_a)
@@ -355,6 +385,7 @@ def exec_while(while_stmt, do_stmt):
 		interpreter_traverser(do_stmt)
 		scopes_stack = temp_stack
 		num_scopes = temp_numscopes
+	update_numscopes(do_stmt)
 
 def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 	global scopes_stack
@@ -365,15 +396,16 @@ def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 		w_condition = while_stmt.children[0].children[0]
 		temp_stack = scopes_stack
 		temp_numscopes = num_scopes
-		interpreter_traverser(repeatdo_stmt)
+		interpreter_traverser(repeat_stmt)
 		scopes_stack = temp_stack
 		num_scopes = temp_numscopes
 		while evaluate(w_condition):
 			temp_stack = scopes_stack
 			temp_numscopes = num_scopes
-			interpreter_traverser(repeatdo_stmt)
+			interpreter_traverser(repeat_stmt)
 			scopes_stack = temp_stack
 			num_scopes = temp_numscopes
+		update_numscopes(repeat_stmt)
 	else:
 		# Repeat While Do
 		repeatdo_stmt = repeat_stmt.children[0]
@@ -387,7 +419,17 @@ def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 			interpreter_traverser(do_stmt)
 			scopes_stack = temp_stack
 			num_scopes = temp_numscopes
+		scopes_stack = temp_stack
+		num_scopes = temp_numscopes
+		update_numscopes(repeatdo_stmt)
+		update_numscopes(do_stmt)
 
+def update_numscopes(AST):
+	global num_scopes
+	if AST.type == "block":
+		num_scopes += 1
+	for child in AST.children:
+		update_numscopes(child)
 
 def get_errors():
 	global error_intr
