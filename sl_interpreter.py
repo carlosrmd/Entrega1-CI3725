@@ -141,9 +141,9 @@ def interpreter_traverser(AST):
 		for scope in scopes_stack:
 			if SymTab.contains(assign_var, scope):
 				act_scope = scope
-		#print(SymTab)
-		#print(scopes_stack)
-		#print(assign_var, expr_val)
+		print(SymTab)
+		print(scopes_stack)
+		print(assign_var, expr_val)
 		assign_var_type = SymTab.typeof(assign_var, act_scope)
 		if assign_var_type == "int":
 			SymTab.update(assign_var, act_scope, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
@@ -440,7 +440,7 @@ def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 
 def update_numscopes(AST):
 	global num_scopes
-	if AST.type == "block":
+	if AST.type == "block" or AST.type == "for_stmt":
 		num_scopes += 1
 	for child in AST.children:
 		update_numscopes(child)
