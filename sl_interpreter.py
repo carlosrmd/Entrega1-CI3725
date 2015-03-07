@@ -80,6 +80,7 @@ def interpreter_traverser(AST):
 					act_string = str(act_value)
 				if act_string[:3] == "set":
 					act_string = "{"
+					act_value = sorted(list(act_value))
 					for elem in act_value:
 						act_string += str(elem) + ","
 					if act_string == "{":

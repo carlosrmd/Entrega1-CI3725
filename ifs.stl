@@ -25,7 +25,13 @@ program {
 				for i min c do {
 					print i, ", ";
 					if (i == 3){
+						using int jack; in
+						while (jack > -10) do{
+							println "Now hack is ", jack;
+							jack = jack - 1;
+						};
 						print "nos besamos en la boocaaa ";
+
 					};
 				};
 				println pepe, " veces";
