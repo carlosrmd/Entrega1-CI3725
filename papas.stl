@@ -24,6 +24,15 @@ program {
             else {
                 using int ka; in
                 print " y mayor o igual a 3 ", ka;
+                if (ka == 0){
+                    println "El brasero del marques el brasero del marques prestigioso restaurant";
+                }
+                else if (ka < 50){
+                    println "La viiiida es yaaa disfruuuutalaaaa el mundo es tuyo para descansaaar";
+                };
+                if (ka < 600) {
+                    println "Christian se la come enterita 8=D";
+                };
             };
         };
         println "";
@@ -32,6 +41,13 @@ program {
     }while (a < 10);
     println c;
     for i min c do {
+        if (i > 5) {
+            using
+                int pipe;
+            in
+            pipe = pipe + 1;
+            println "Pipe ahora es ", pipe;
+        };
         println "Ahora i es ", i, " en el for 1";
     };
     while (b < 10) do {
@@ -48,9 +64,7 @@ program {
     } while (b < 10) do {
         b = b + 1;
     };
-    println "culo";
-    for ernesto min c do {
-        println "culo";
-        println "Ahora i es ", ernesto, " en el for 3";
+    for i min c do {
+        println "Ahora i es ", i, " en el for 3";
     };
 }

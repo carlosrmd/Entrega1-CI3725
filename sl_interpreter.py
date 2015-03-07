@@ -34,12 +34,9 @@ def interpreter_traverser(AST):
 		iter_var = AST.children[0].children[0].val
 		iter_dir = AST.children[1].children[0].val
 		iter_set = evaluate(AST.children[3])
-		if str(iter_set) == "Fatal": return
+		if str(iter_set) == "Fatal": return False
 		do_stmt = AST.children[4]
 		iter_list = sorted(iter_set)
-		print(SymTab)
-		print(num_scopes)
-		print(scopes_stack)
 		for scope in scopes_stack:
 			if SymTab.contains(iter_var, scope):
 				act_scope = scope
@@ -51,7 +48,8 @@ def interpreter_traverser(AST):
 			interpreter_traverser(do_stmt)
 			scopes_stack = temp_stack
 			num_scopes = temp_numscopes
-		num_scopes += 1
+		#num_scopes += 1
+		update_numscopes(do_stmt)
 		scopes_stack.pop()
 		return
 
@@ -74,6 +72,7 @@ def interpreter_traverser(AST):
 					string = string + act[-1]
 			else:
 				act_value = evaluate(elem)
+				if str(act_value) == "Fatal": return False
 				if act_value is True or act_value is False:
 					if act_value: act_string = "true"
 					else: act_string = "false"
@@ -142,6 +141,9 @@ def interpreter_traverser(AST):
 		for scope in scopes_stack:
 			if SymTab.contains(assign_var, scope):
 				act_scope = scope
+		#print(SymTab)
+		#print(scopes_stack)
+		#print(assign_var, expr_val)
 		assign_var_type = SymTab.typeof(assign_var, act_scope)
 		if assign_var_type == "int":
 			SymTab.update(assign_var, act_scope, assign_var_type, expr_val, SymTab.lin_decof(assign_var, num_scopes))
@@ -162,12 +164,14 @@ def interpreter_traverser(AST):
 
 	elif AST.type == "if_stmt":
 		if_expr = AST.children[0].children[0]
+		if_expr_val = evaluate(if_expr)
+		if str(if_expr_val) == "Fatal": return False
 		if evaluate(if_expr):
 			interpreter_traverser(AST.children[1])
 			return
 		else:
 			if len(AST.children) > 2:
-				num_scopes += 1
+				if AST.children[1].children[0].type == "block": num_scopes += 1
 				interpreter_traverser(AST.children[2])
 		return
 
@@ -379,6 +383,7 @@ def exec_while(while_stmt, do_stmt):
 	global scopes_stack
 	global num_scopes
 	w_condition = while_stmt.children[0].children[0]
+	if str(evaluate(w_condition)) == "Fatal": return False
 	while evaluate(w_condition):
 		temp_stack = scopes_stack
 		temp_numscopes = num_scopes
@@ -394,6 +399,7 @@ def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 		# Repeat While
 		repeatdo_stmt = repeat_stmt.children[0]
 		w_condition = while_stmt.children[0].children[0]
+		if str(evaluate(w_condition)) == "Fatal": return False
 		temp_stack = scopes_stack
 		temp_numscopes = num_scopes
 		interpreter_traverser(repeat_stmt)
@@ -410,6 +416,7 @@ def exec_repeatwhile(repeat_stmt, while_stmt, do_stmt):
 		# Repeat While Do
 		repeatdo_stmt = repeat_stmt.children[0]
 		w_condition = while_stmt.children[0].children[0]
+		if str(evaluate(w_condition)) == "Fatal": return False
 		while True:
 			temp_stack = scopes_stack
 			temp_numscopes = num_scopes
