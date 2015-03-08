@@ -38,9 +38,6 @@ def interpreter_traverser(AST):
 		if str(iter_set) == "Fatal": return False
 		do_stmt = AST.children[4]
 		iter_list = sorted(iter_set)
-		print(scopes_stack)
-		print(SymTab)
-		print(iter_var)
 		for scope in scopes_stack:
 			if SymTab.contains(iter_var, scope):
 				act_scope = scope
