@@ -81,8 +81,8 @@ def build_symbol_table_REC(AST):
 		indent_level += 1
 
 		name = str(AST.children[0].children[0].val)
-		if vardeclared(name):
-			error_st.append(("redec", name, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
+		#if vardeclared(name):
+		#	error_st.append(("redec", name, AST.children[0].children[0].lineno, AST.children[0].children[0].colno))
 		dec_scope = num_scopes
 		type = "int"
 		val = "0"

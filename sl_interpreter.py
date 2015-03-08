@@ -30,11 +30,11 @@ def interpreter_traverser(AST):
 		scopes_stack.append(num_scopes)
 
 	elif AST.type == "for_stmt":
+		iter_set = evaluate(AST.children[3])
 		num_scopes += 1
 		scopes_stack.append(num_scopes)
 		iter_var = AST.children[0].children[0].val
 		iter_dir = AST.children[1].children[0].val
-		iter_set = evaluate(AST.children[3])
 		if str(iter_set) == "Fatal": return False
 		do_stmt = AST.children[4]
 		iter_list = sorted(iter_set)
@@ -49,7 +49,6 @@ def interpreter_traverser(AST):
 			interpreter_traverser(do_stmt)
 			scopes_stack = temp_stack
 			num_scopes = temp_numscopes
-		#num_scopes += 1
 		update_numscopes(do_stmt)
 		scopes_stack.pop()
 		return
@@ -91,6 +90,7 @@ def interpreter_traverser(AST):
 		printf(string)
 
 	elif AST.type == "scan":
+		max_int = 2147483646
 		variable = AST.children[0].children[0]
 		for scope in scopes_stack:
 			if SymTab.contains(variable.val, scope):
@@ -122,6 +122,9 @@ def interpreter_traverser(AST):
 				print("ERROR: No se reconoce la entrada.")
 				exit(1)
 		else:
+			if valueType == "int" and value > max_int:
+				print("ERROR: La entrada ha causado overflow.")
+				exit(1)
 			SymTab.update(variable.val, act_scope, varType, value, SymTab.lin_decof(variable.val, num_scopes))
 
 	elif AST.type == "vardec":
