@@ -43,6 +43,7 @@ class Node:
 # PRECEDENCIA entre operadores, de menor a mayor
 
 precedence = (
+	('right', 'THEN', 'ELSE'),
 	# Operadores sobre bool
 	('left', 'OR'),
 	('left', 'AND'),
@@ -289,8 +290,8 @@ def p_expr_unropr(p):
 ### BLOQUES CONDICIONALES
 
 def p_condition(p):
-	'''condition : IF LPAREN expr RPAREN instr
-				 | IF LPAREN expr RPAREN block
+	'''condition : IF LPAREN expr RPAREN instr %prec THEN
+				 | IF LPAREN expr RPAREN block %prec THEN
 				 | IF LPAREN expr RPAREN instr ELSE instr
 				 | IF LPAREN expr RPAREN instr ELSE block
 				 | IF LPAREN expr RPAREN block ELSE instr
