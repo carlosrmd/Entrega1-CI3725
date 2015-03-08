@@ -1,0 +1,26 @@
+program {
+	using
+		int x, n, res;
+		set s;
+	in
+
+	print "Introduzca el numero al que desea calcular el factorial : ";
+	scan n;
+	
+	x = 1;
+	res = 1;
+
+	while (x <= n) do {
+		s = s ++ {x};
+		x = x + 1;
+	};
+	
+	for i min s do {
+		if (i <= n)
+			res = res * i
+		;
+	};
+	
+	println "El conjunto 's' es: ", s;
+	println "El resultado es: ", res, "\n", "Chao";
+}
