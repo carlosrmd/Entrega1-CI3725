@@ -43,7 +43,9 @@ class Node:
 # PRECEDENCIA entre operadores, de menor a mayor
 
 precedence = (
+	# Asociatividad del 'else_stmt' con el 'if_stmt'-'then-stmt' mas cercano
 	('right', 'THEN', 'ELSE'),
+
 	# Operadores sobre bool
 	('left', 'OR'),
 	('left', 'AND'),
