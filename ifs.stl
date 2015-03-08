@@ -2,7 +2,7 @@ program {
 	using
 		int n;
 	in
-	print "Introduzca un n: ";
+	print "Introduzca un n (preferiblemente seis): ";
 	scan n;
 	if (n == 6) {
 		if (true){
@@ -14,8 +14,9 @@ program {
 			};
 		};
 	} else {
-		using int pepe; set c; in
+		using int pepe; set c, f; in
 		c = {1,2,3};
+		f = {1,2,3,4,5};
 		println "n no es seis pero palante con el comandante.";
 		print "Introduzca pepe: ";
 		scan pepe;
@@ -30,8 +31,10 @@ program {
 							println "Now hack is ", jack;
 							jack = jack - 1;
 						};
-						print "nos besamos en la boocaaa ";
-
+						println "nos besamos en la boocaaa ";
+					};
+					for y min f do {
+						println "Ahora i es ", i, " y y es ", y, " la suma da ", i+y;
 					};
 				};
 				println pepe, " veces";
@@ -39,9 +42,21 @@ program {
 
 			};
 		} else {
-			using int mojon; in
+			using int mojon, n; bool p; in
 			mojon = 666;
-			println "No es cero :C pero mojon es ", mojon;
+			print "No es cero :C pero mojon es ", mojon, " te gusta el mojon? (true/false): ";
+			scan p;
+			if (p){
+				println "Mierda que maldito asco";
+				while (n < 16) do {
+					print " hola ", n, " ";
+					n = n + 1;
+				};
+				println "";
+			} else {
+				println "bien, eres persona.";
+			};
+
 		};
 	};
 	println "Chaito compadre digalo chao a n que vale: ", n;

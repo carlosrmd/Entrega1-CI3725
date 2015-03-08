@@ -145,7 +145,8 @@ def build_symbol_table_REC(AST):
 				no_erros = False
 				error_st.append(("nodec", name, lin_dec, col_dec))
 		if no_errors:
-			gettype(AST.children[0].children[0])
+			for child in AST.children[0].children:
+				gettype(child)
 
 
 	elif AST.type == "if_stmt" or AST.type == "while_stmt":
@@ -236,7 +237,7 @@ def gettype(AST):
 		b = gettype(AST.children[1])
 		if a == b and a == "int":
 			return "bool"
-		if a == b and a == "set" and (AST.val.split()[1] == "==" or AST.val.split()[1] == "/="):
+		if (a == b and (a == "set" or a == "bool")) and (AST.val.split()[1] == "==" or AST.val.split()[1] == "/="):
 			return "bool"
 		else:
 			opr = AST.val.split(" ")

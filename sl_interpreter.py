@@ -38,6 +38,9 @@ def interpreter_traverser(AST):
 		if str(iter_set) == "Fatal": return False
 		do_stmt = AST.children[4]
 		iter_list = sorted(iter_set)
+		print(scopes_stack)
+		print(SymTab)
+		print(iter_var)
 		for scope in scopes_stack:
 			if SymTab.contains(iter_var, scope):
 				act_scope = scope
@@ -162,14 +165,12 @@ def interpreter_traverser(AST):
 	elif AST.type == "if_stmt":
 		if_expr = AST.children[0].children[0]
 		if_expr_val = evaluate(if_expr)
-		if str(if_expr_val) == "Fatal": return False
-		if evaluate(if_expr):
+		if if_expr_val:
 			interpreter_traverser(AST.children[1])
 			return
-		else:
-			if len(AST.children) > 2:
-				update_numscopes(AST.children[1])
-				interpreter_traverser(AST.children[2])
+		update_numscopes(AST.children[1])
+		if len(AST.children) > 2:
+			if not if_expr_val: interpreter_traverser(AST.children[2])
 		return
 
 	# Recorre los hijos del nodo actual
@@ -223,6 +224,7 @@ def getcol(lineno, lexpos):
 
 def evaluate(expr):
 	max_int = 2147483646
+
 	# Casos base
 	if expr.type == "int_stmt" or expr.type == "set_stmt":
 		if expr.type == "set_stmt":
