@@ -1,18 +1,21 @@
 program {
     using
-        set s;
+        set s, d;
         int n;
     in
     s = {2, 3, 1};
+    d = {1,2,3,4,5};
+    if (true) {
+        println "culo";
+    };
     for i min s do {
-    	if (i > 3){
-    		using
-    			int pipe;
-    		in
-    		pipe = pipe + 1;
-    	};
-        println i;
-        s = s ++ {i * 2}; # unión de conjuntos
+        if (i == 2) {
+            println "hola";
+        };
+        if (i == 3) {
+            using int hehe; in
+            println hehe;
+        };
     };
 
     print s;
