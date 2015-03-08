@@ -1,6 +1,6 @@
 program {
 	using
-		int x, n, res;
+		int x, n, res, res2;
 		set s;
 	in
 
@@ -15,12 +15,46 @@ program {
 		x = x + 1;
 	};
 	
-	for i min s do {
-		if (i <= n)
-			res = res * i
-		;
+	for i min s do
+		res = res * i
+	;
+
+	repeat {
+		using
+			int z;
+		in
+		
+		z = x - 1;
+
+		repeat
+			print ""
+		while (x > z) do {
+			x = x - 1;
+		};
+	}
+	while (x > 0) do {
+		using
+			int y;
+		in
+		
+		println "\nx es : ", x, "\nres2 es: ", res2;
+
+		repeat
+			y = y + 1
+		while (y < 5) do {
+			println "\n	y es : ", y;
+			res2 = res2 + x + y;
+		};
 	};
+
 	
 	println "El conjunto 's' es: ", s;
-	println "El resultado es: ", res, "\n", "Chao";
+	println "El resultado es: ", res;
+	println "LO OTRO ES: ", res2, "\nChao";
+	println "METETELO POR EL CULO";
+	print "culo\n";
+	print "teta\n";
+	print "nalga\n";
+	print "cuca\n";
+	print "\n";
 }
