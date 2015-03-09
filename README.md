@@ -1,3 +1,3 @@
-Primera entrega del proyecto de CI3725.
+Interpretador de Setlan
 
-Analizador lexicográfico del lenguaje Setlan.
+Proyecto de la asignatura CI3725 Traductores e Interpretadores en la Universidad Simón Bolívar
